@@ -1,0 +1,8 @@
+
+DP, DDIM 10, new noise each plan              success=0.01  collision=0.985  timeout=0.005  left=0  right=0  plan_flips=0.64  roughness_x100=32.3  max_kink_x100=126  calls_per_plan=10  ms_per_plan=75.7  macs_per_plan=1.9e+06
+DP, DDIM 10, same noise                       success=0  collision=0.5  timeout=0.5  left=0  right=0  plan_flips=0.2  roughness_x100=nan  max_kink_x100=nan  calls_per_plan=10  ms_per_plan=75.2  macs_per_plan=1.9e+06
+DP, warm start (t=50, 3 steps)                success=0.05  collision=0.83  timeout=0.12  left=6  right=3  plan_flips=0.575  roughness_x100=20  max_kink_x100=75.8  calls_per_plan=3.39  ms_per_plan=25  macs_per_plan=6.42e+05
+
+first plan at start (DP): left 50.5%, right 47.6%, undecided 1.8%
+
+saved to dp_out/small/

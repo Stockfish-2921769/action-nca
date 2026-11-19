@@ -1,0 +1,37 @@
+
+DP, DDIM 10, new noise each plan              success=0.985  collision=0.015  timeout=0  left=97  right=100  plan_flips=1.13  roughness_x100=1.13  max_kink_x100=5.45  calls_per_plan=10  ms_per_plan=235  macs_per_plan=4.7e+07
+DP, DDIM 10, same noise                       success=0.995  collision=0.005  timeout=0  left=101  right=98  plan_flips=0.285  roughness_x100=1.15  max_kink_x100=3.62  calls_per_plan=10  ms_per_plan=231  macs_per_plan=4.7e+07
+DP, warm start (t=50, 3 steps)                success=1  collision=0  timeout=0  left=99  right=101  plan_flips=0.275  roughness_x100=1.7  max_kink_x100=6.55  calls_per_plan=3.58  ms_per_plan=83.9  macs_per_plan=1.68e+07
+NCA, deterministic, cold start                success=0.88  collision=0.12  timeout=0  left=85  right=91  plan_flips=0  roughness_x100=1.45  max_kink_x100=4.14  calls_per_plan=32  ms_per_plan=38.9  macs_per_plan=5.58e+06
+NCA, latent z, cold start, new z each plan    success=0.81  collision=0.19  timeout=0  left=103  right=59  plan_flips=1.3  roughness_x100=1.61  max_kink_x100=5.34  calls_per_plan=32  ms_per_plan=38.6  macs_per_plan=5.58e+06
+NCA, latent z, cold start, same z             success=0.965  collision=0.035  timeout=0  left=100  right=93  plan_flips=0.08  roughness_x100=1.59  max_kink_x100=4.28  calls_per_plan=32  ms_per_plan=38.5  macs_per_plan=5.58e+06
+NCA, latent z, warm start (regrow)            success=0.99  collision=0.01  timeout=0  left=102  right=96  plan_flips=0.01  roughness_x100=1.92  max_kink_x100=5.62  calls_per_plan=11.7  ms_per_plan=14.1  macs_per_plan=2.04e+06
+
+核对 rollout 与 action_nca.run_episodes（latent warm）：一致
+
+first plan at start (DP): left 47.3%, right 50.0%, undecided 2.6%
+
+步数扫描：
+  DP fresh noise, leading      ddim_steps= 1  success=0.025  collision=0.975  flips=0.09  roughness=154.40
+  DP fresh noise, leading      ddim_steps= 2  success=0.415  collision=0.580  flips=0.91  roughness=10.09
+  DP fresh noise, leading      ddim_steps= 3  success=0.930  collision=0.070  flips=1.08  roughness=2.31
+  DP fresh noise, leading      ddim_steps= 5  success=0.975  collision=0.025  flips=1.15  roughness=1.25
+  DP fresh noise, leading      ddim_steps=10  success=0.985  collision=0.015  flips=1.13  roughness=1.13
+  DP fresh noise, leading      ddim_steps=20  success=0.985  collision=0.015  flips=1.14  roughness=1.15
+  DP fresh noise, trailing     ddim_steps= 1  success=0.000  collision=0.130  flips=0.20  roughness=nan
+  DP fresh noise, trailing     ddim_steps= 2  success=0.615  collision=0.380  flips=0.86  roughness=10.33
+  DP fresh noise, trailing     ddim_steps= 3  success=0.925  collision=0.075  flips=0.98  roughness=4.45
+  DP fresh noise, trailing     ddim_steps= 5  success=0.970  collision=0.030  flips=1.01  roughness=2.56
+  DP fresh noise, trailing     ddim_steps=10  success=0.985  collision=0.015  flips=1.11  roughness=1.64
+  DP fresh noise, trailing     ddim_steps=20  success=0.980  collision=0.020  flips=1.12  roughness=1.30
+  DP warm start (t=50)         warm_steps=1  calls/plan=1.6  success=0.990  collision=0.010  flips=0.33  roughness=3.74
+  DP warm start (t=50)         warm_steps=2  calls/plan=2.6  success=1.000  collision=0.000  flips=0.28  roughness=2.05
+  DP warm start (t=50)         warm_steps=3  calls/plan=3.6  success=1.000  collision=0.000  flips=0.28  roughness=1.70
+  DP warm start (t=50)         warm_steps=5  calls/plan=5.4  success=1.000  collision=0.000  flips=0.27  roughness=1.40
+  NCA regrow                   warm_steps= 2  calls/plan=3.7  success=0.535  roughness=6.21
+  NCA regrow                   warm_steps= 4  calls/plan=6.0  success=0.980  roughness=3.56
+  NCA regrow                   warm_steps= 6  calls/plan=8.0  success=0.980  roughness=2.57
+  NCA regrow                   warm_steps=10  calls/plan=11.7  success=0.990  roughness=1.92
+  NCA regrow                   warm_steps=14  calls/plan=15.4  success=0.990  roughness=1.87
+
+saved to dp_out/

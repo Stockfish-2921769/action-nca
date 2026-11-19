@@ -1,0 +1,13 @@
+[dp] it     1  loss 1.1961  1s
+[dp] it   500  loss 0.1127  38s
+[dp] it  1000  loss 0.0522  75s
+[dp] it  1500  loss 0.0376  112s
+[dp] it  2000  loss 0.0309  148s
+[dp] it  2500  loss 0.0251  185s
+[dp] it  3000  loss 0.0214  221s
+[dp] it  3500  loss 0.0196  257s
+[dp] it  4000  loss 0.0173  293s
+[dp] it  4500  loss 0.0161  330s
+[dp] it  5000  loss 0.0152  366s
+[dp] it  5500  loss 0.0149  406s
+[dp] it  6000  loss 0.0146  1109s

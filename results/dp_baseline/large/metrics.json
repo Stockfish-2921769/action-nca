@@ -1,0 +1,231 @@
+{
+  "config": {
+    "iters": 6000,
+    "batch": 256,
+    "lr": 0.0005,
+    "lr_warmup": 300,
+    "ema": 0.999,
+    "dims": [
+      32,
+      64,
+      128
+    ],
+    "kernel": 5,
+    "t_dim": 64,
+    "groups": 8,
+    "obs_noise": 0.01,
+    "ddim_steps": 10,
+    "spacing": "leading",
+    "warm_t": 50,
+    "warm_steps": 3,
+    "n_demos": 200,
+    "episodes": 200,
+    "max_steps": 72,
+    "log_every": 500,
+    "seed": 0,
+    "device": "cpu",
+    "eval_device": "cpu",
+    "train_only": false,
+    "load": "dp_out/dp_policy.pt",
+    "nca_dir": "nca_out",
+    "no_sweep": false,
+    "out": "dp_out",
+    "dp_params": 1111906,
+    "dp_macs_per_call": 4696576,
+    "nca_params": 10688,
+    "nca_macs_per_step": 174464,
+    "eval_seed": 1
+  },
+  "settings": {
+    "DP, DDIM 10, new noise each plan": {
+      "success": 0.985,
+      "collision": 0.015,
+      "timeout": 0.0,
+      "left": 97,
+      "right": 100,
+      "plan_flips": 1.13,
+      "roughness_x100": 1.1262487173080444,
+      "max_kink_x100": 5.446345806121826,
+      "calls_per_plan": 10.0,
+      "ms_per_plan": 235.16726199938734,
+      "macs_per_plan": 46965760.0
+    },
+    "DP, DDIM 10, same noise": {
+      "success": 0.995,
+      "collision": 0.005,
+      "timeout": 0.0,
+      "left": 101,
+      "right": 98,
+      "plan_flips": 0.285,
+      "roughness_x100": 1.1540839672088623,
+      "max_kink_x100": 3.623368978500366,
+      "calls_per_plan": 10.0,
+      "ms_per_plan": 230.80461914313284,
+      "macs_per_plan": 46965760.0
+    },
+    "DP, warm start (t=50, 3 steps)": {
+      "success": 1.0,
+      "collision": 0.0,
+      "timeout": 0.0,
+      "left": 99,
+      "right": 101,
+      "plan_flips": 0.275,
+      "roughness_x100": 1.6984269618988037,
+      "max_kink_x100": 6.551705837249756,
+      "calls_per_plan": 3.5833333333333335,
+      "ms_per_plan": 83.90638558315307,
+      "macs_per_plan": 16829397.333333336
+    },
+    "NCA, deterministic, cold start": {
+      "success": 0.88,
+      "collision": 0.12,
+      "timeout": 0.0,
+      "left": 85,
+      "right": 91,
+      "plan_flips": 0.0,
+      "roughness_x100": 1.451367974281311,
+      "max_kink_x100": 4.137750148773193,
+      "calls_per_plan": 32.0,
+      "ms_per_plan": 38.86006583312943,
+      "macs_per_plan": 5582848.0
+    },
+    "NCA, latent z, cold start, new z each plan": {
+      "success": 0.81,
+      "collision": 0.19,
+      "timeout": 0.0,
+      "left": 103,
+      "right": 59,
+      "plan_flips": 1.305,
+      "roughness_x100": 1.6068363189697266,
+      "max_kink_x100": 5.34301233291626,
+      "calls_per_plan": 32.0,
+      "ms_per_plan": 38.6015063855806,
+      "macs_per_plan": 5582848.0
+    },
+    "NCA, latent z, cold start, same z": {
+      "success": 0.965,
+      "collision": 0.035,
+      "timeout": 0.0,
+      "left": 100,
+      "right": 93,
+      "plan_flips": 0.08,
+      "roughness_x100": 1.5888323783874512,
+      "max_kink_x100": 4.279856204986572,
+      "calls_per_plan": 32.0,
+      "ms_per_plan": 38.50008035728284,
+      "macs_per_plan": 5582848.0
+    },
+    "NCA, latent z, warm start (regrow)": {
+      "success": 0.99,
+      "collision": 0.01,
+      "timeout": 0.0,
+      "left": 102,
+      "right": 96,
+      "plan_flips": 0.01,
+      "roughness_x100": 1.9156219959259033,
+      "max_kink_x100": 5.623184680938721,
+      "calls_per_plan": 11.692307692307692,
+      "ms_per_plan": 14.135506384403785,
+      "macs_per_plan": 2039886.769230769
+    }
+  },
+  "first_plan_at_start": {
+    "left": 0.4735,
+    "right": 0.5005,
+    "undecided": 0.026
+  },
+  "sweep": {
+    "DP fresh noise, leading": [
+      [
+        1.0,
+        0.025
+      ],
+      [
+        2.0,
+        0.415
+      ],
+      [
+        3.0,
+        0.93
+      ],
+      [
+        5.0,
+        0.975
+      ],
+      [
+        10.0,
+        0.985
+      ],
+      [
+        20.0,
+        0.985
+      ]
+    ],
+    "DP fresh noise, trailing": [
+      [
+        1.0,
+        0.0
+      ],
+      [
+        2.0,
+        0.615
+      ],
+      [
+        3.0,
+        0.925
+      ],
+      [
+        5.0,
+        0.97
+      ],
+      [
+        10.0,
+        0.985
+      ],
+      [
+        20.0,
+        0.98
+      ]
+    ],
+    "DP warm start (t=50)": [
+      [
+        1.6428571428571428,
+        0.99
+      ],
+      [
+        2.6153846153846154,
+        1.0
+      ],
+      [
+        3.5833333333333335,
+        1.0
+      ],
+      [
+        5.416666666666667,
+        1.0
+      ]
+    ],
+    "NCA regrow": [
+      [
+        3.6666666666666665,
+        0.535
+      ],
+      [
+        6.0,
+        0.98
+      ],
+      [
+        8.0,
+        0.98
+      ],
+      [
+        11.692307692307692,
+        0.99
+      ],
+      [
+        15.384615384615385,
+        0.99
+      ]
+    ]
+  }
+}

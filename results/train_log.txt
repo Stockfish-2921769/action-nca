@@ -1,0 +1,22 @@
+[det] it     1  cold 2.5394  warm 0.0000  2s
+[det] it   250  cold 0.2190  warm 0.2944  29s
+[det] it   500  cold 0.3030  warm 0.4177  58s
+[det] it   750  cold 0.2938  warm 0.2476  87s
+[det] it  1000  cold 0.2925  warm 0.5388  115s
+[det] it  1250  cold 0.4244  warm 0.3709  142s
+[det] it  1500  cold 0.2960  warm 0.1711  171s
+[latent] it     1  cold 2.5394  warm 0.0000  0s
+[latent] it   250  cold 0.0516  warm 0.2248  81s
+[latent] it   500  cold 0.0365  warm 0.0341  162s
+[latent] it   750  cold 0.3330  warm 0.0383  241s
+[latent] it  1000  cold 0.0167  warm 0.0307  323s
+[latent] it  1250  cold 0.0534  warm 0.0308  403s
+[latent] it  1500  cold 0.0224  warm 0.0286  486s
+
+deterministic, cold start                success=0.925  collision=0.075  timeout=0  left=129  right=56  plan_flips=0  roughness_x100=1.45  nca_steps_per_plan=32
+latent z, cold start, new z each plan    success=0.82  collision=0.18  timeout=0  left=89  right=75  plan_flips=1.29  roughness_x100=1.64  nca_steps_per_plan=32
+latent z, cold start, same z             success=0.96  collision=0.035  timeout=0.005  left=103  right=89  plan_flips=0.07  roughness_x100=1.49  nca_steps_per_plan=32
+latent z, warm start (regrow)            success=0.985  collision=0.015  timeout=0  left=101  right=96  plan_flips=0.005  roughness_x100=1.83  nca_steps_per_plan=11.7
+
+first plan at start: latent left 51%, right 47%, undecided 2%; deterministic offset -0.007
+saved to nca_out/

@@ -1,0 +1,12 @@
+# 步数扫描（默认参数训练的隐变量模型，seed 1，200 回合）
+cold_fixed cold_steps= 8  success=0.94 collision=0.04 flips=0.33 rough=2.92
+cold_fixed cold_steps=16  success=0.94 collision=0.06 flips=0.48 rough=1.64
+cold_fixed cold_steps=24  success=0.94 collision=0.05 flips=0.09 rough=1.48
+cold_fixed cold_steps=32  success=0.96 collision=0.04 flips=0.07 rough=1.49
+cold_fixed cold_steps=40  success=0.97 collision=0.03 flips=0.07 rough=1.56
+warm warm_steps= 2  success=0.35 collision=0.46 L/R=34/36 flips=0.00 rough=6.18 steps/plan=3.7
+warm warm_steps= 4  success=0.96 collision=0.04 L/R=102/91 flips=0.00 rough=3.36 steps/plan=5.9
+warm warm_steps= 6  success=0.97 collision=0.03 L/R=102/92 flips=0.00 rough=2.41 steps/plan=8.2
+warm warm_steps=10  success=0.98 collision=0.01 L/R=101/96 flips=0.01 rough=1.83 steps/plan=11.7
+warm warm_steps=14  success=0.99 collision=0.01 L/R=101/98 flips=0.01 rough=1.78 steps/plan=15.4
+warm warm_steps=20  success=0.99 collision=0.01 L/R=99/99 flips=0.01 rough=1.97 steps/plan=20.9

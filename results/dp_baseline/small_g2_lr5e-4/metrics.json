@@ -1,0 +1,86 @@
+{
+  "config": {
+    "iters": 6000,
+    "batch": 256,
+    "lr": 0.0005,
+    "lr_warmup": 300,
+    "ema": 0.999,
+    "dims": [
+      8,
+      16,
+      32
+    ],
+    "kernel": 3,
+    "t_dim": 16,
+    "groups": 2,
+    "obs_noise": 0.01,
+    "ddim_steps": 10,
+    "spacing": "leading",
+    "warm_t": 50,
+    "warm_steps": 3,
+    "n_demos": 200,
+    "episodes": 200,
+    "max_steps": 72,
+    "log_every": 500,
+    "seed": 0,
+    "device": "cpu",
+    "eval_device": "cpu",
+    "train_only": false,
+    "load": "dp_out/small_g2/dp_policy.pt",
+    "nca_dir": "none",
+    "no_sweep": true,
+    "out": "dp_out/small_g2",
+    "dp_params": 49594,
+    "dp_macs_per_call": 189568,
+    "nca_params": null,
+    "nca_macs_per_step": null,
+    "eval_seed": 1
+  },
+  "settings": {
+    "DP, DDIM 10, new noise each plan": {
+      "success": 0.735,
+      "collision": 0.265,
+      "timeout": 0.0,
+      "left": 85,
+      "right": 62,
+      "plan_flips": 1.06,
+      "roughness_x100": 7.165066719055176,
+      "max_kink_x100": 53.06575393676758,
+      "calls_per_plan": 10.0,
+      "ms_per_plan": 71.97572911071701,
+      "macs_per_plan": 1895680.0
+    },
+    "DP, DDIM 10, same noise": {
+      "success": 0.86,
+      "collision": 0.095,
+      "timeout": 0.045,
+      "left": 90,
+      "right": 82,
+      "plan_flips": 0.3,
+      "roughness_x100": 4.658637523651123,
+      "max_kink_x100": 11.341090202331543,
+      "calls_per_plan": 10.0,
+      "ms_per_plan": 72.69090050047251,
+      "macs_per_plan": 1895680.0
+    },
+    "DP, warm start (t=50, 3 steps)": {
+      "success": 0.965,
+      "collision": 0.035,
+      "timeout": 0.0,
+      "left": 96,
+      "right": 97,
+      "plan_flips": 0.215,
+      "roughness_x100": 6.019766807556152,
+      "max_kink_x100": 29.18016815185547,
+      "calls_per_plan": 3.5,
+      "ms_per_plan": 25.41951192844343,
+      "macs_per_plan": 663488.0
+    }
+  },
+  "first_plan_at_start": {
+    "left": 0.413,
+    "right": 0.5265,
+    "undecided": 0.0605
+  },
+  "sweep": {}
+}

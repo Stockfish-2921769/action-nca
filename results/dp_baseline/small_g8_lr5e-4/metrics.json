@@ -1,0 +1,86 @@
+{
+  "config": {
+    "iters": 6000,
+    "batch": 256,
+    "lr": 0.0005,
+    "lr_warmup": 300,
+    "ema": 0.999,
+    "dims": [
+      8,
+      16,
+      32
+    ],
+    "kernel": 3,
+    "t_dim": 16,
+    "groups": 8,
+    "obs_noise": 0.01,
+    "ddim_steps": 10,
+    "spacing": "leading",
+    "warm_t": 50,
+    "warm_steps": 3,
+    "n_demos": 200,
+    "episodes": 200,
+    "max_steps": 72,
+    "log_every": 500,
+    "seed": 0,
+    "device": "cpu",
+    "eval_device": "cpu",
+    "train_only": false,
+    "load": "dp_out/small/dp_policy.pt",
+    "nca_dir": "none",
+    "no_sweep": true,
+    "out": "dp_out/small",
+    "dp_params": 49594,
+    "dp_macs_per_call": 189568,
+    "nca_params": null,
+    "nca_macs_per_step": null,
+    "eval_seed": 1
+  },
+  "settings": {
+    "DP, DDIM 10, new noise each plan": {
+      "success": 0.01,
+      "collision": 0.985,
+      "timeout": 0.005,
+      "left": 0,
+      "right": 0,
+      "plan_flips": 0.64,
+      "roughness_x100": 32.339149475097656,
+      "max_kink_x100": 125.84512329101562,
+      "calls_per_plan": 10.0,
+      "ms_per_plan": 75.71261350050109,
+      "macs_per_plan": 1895680.0
+    },
+    "DP, DDIM 10, same noise": {
+      "success": 0.0,
+      "collision": 0.5,
+      "timeout": 0.5,
+      "left": 0,
+      "right": 0,
+      "plan_flips": 0.2,
+      "roughness_x100": NaN,
+      "max_kink_x100": NaN,
+      "calls_per_plan": 10.0,
+      "ms_per_plan": 75.24713655584492,
+      "macs_per_plan": 1895680.0
+    },
+    "DP, warm start (t=50, 3 steps)": {
+      "success": 0.05,
+      "collision": 0.83,
+      "timeout": 0.12,
+      "left": 6,
+      "right": 3,
+      "plan_flips": 0.575,
+      "roughness_x100": 19.99125099182129,
+      "max_kink_x100": 75.84268188476562,
+      "calls_per_plan": 3.388888888888889,
+      "ms_per_plan": 25.03774311117013,
+      "macs_per_plan": 642424.8888888889
+    }
+  },
+  "first_plan_at_start": {
+    "left": 0.505,
+    "right": 0.4765,
+    "undecided": 0.0185
+  },
+  "sweep": {}
+}
