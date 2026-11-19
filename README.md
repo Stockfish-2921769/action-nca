@@ -46,6 +46,9 @@ DP：条件 1D U-Net（FiLM）+ DDIM 10 步，EMA 权重，输入输出和 NCA �
 | DP 小，热启动（1 步 DDIM） | 99% | 1% | 0.29 | 1.6 | 0.3 M |
 | DP 小，热启动（3 步 DDIM） | 100% | 0% | 0.23 | 3.5 | 0.67 M |
 | DP 大（111 万参数），每次新噪声 | 98.5% | 1.5% | 1.13 | 10 | 47 M |
+| 流匹配小（同一 U-Net），每次新噪声（Euler 10 步） | 99.5% | 0.5% | 1.15 | 10 | 1.9 M |
+| 流匹配小，每次新噪声（Euler 1 步） | 94.5% | 5.5% | 0.43 | 1 | 0.19 M |
+| 流匹配小，热启动（3 步） | 100% | 0% | 0.27 | 3.5 | 0.67 M |
 | NCA 隐变量，每次新 z | 81% | 19% | 1.31 | 32 | 5.6 M |
 | NCA 隐变量，z 固定 | 96.5% | 3.5% | 0.08 | 32 | 5.6 M |
 | NCA 隐变量，再生 | 99% | 1% | 0.01 | 11.7 | 2.0 M |
@@ -58,7 +61,8 @@ DP：条件 1D U-Net（FiLM）+ DDIM 10 步，EMA 权重，输入输出和 NCA �
 2. 再生执行比每次从头生成省步数、模态更连贯。但**这不是 NCA 独有的**：DP 用 SDEdit 式热启动同样省步数，在单次调用算力相当时需要的调用更少。
 3. 每次重新采随机性时，DP 和 NCA 的计划翻转次数差不多，但 DP 几乎不撞（2%），NCA 撞得多（19%），原因待查。
 4. NCA 真正领先的是**模态一致性**：再生时计划翻转 0.01，DP 是 0.23–0.29。在这个玩具任务上，这还没有转化成成功率的差距。
-5. 小 DP 对结构超参敏感（GroupNorm 组数不对时完全训练不起来）。NCA 没有经过同等程度的调参，训练样本也更少，比较并不完全对等。
+5. 把扩散换成流匹配（π0 一类 VLA 的做法）后，DP 在少步数时更强：只用 1 次网络调用就有 94.5%，NCA 在算力上的说法更站不住。
+6. 小 DP 对结构超参敏感（GroupNorm 组数不对时完全训练不起来）。NCA 没有经过同等程度的调参，训练样本也更少，比较并不完全对等。
 
 ## 运行
 
@@ -76,6 +80,10 @@ python diffusion_baseline.py --load dp_out/dp_policy.pt  # CPU 上评估，并�
 # 和 NCA 每步算力相当的小 DP
 python diffusion_baseline.py --device mps --train_only --dims 8 16 32 --kernel 3 --t_dim 16 --groups 2 --lr 2e-3 --out dp_out/small
 python diffusion_baseline.py --load dp_out/small/dp_policy.pt --out dp_out/small
+
+# 流匹配版本（π0 一类 VLA 的动作头做法）：加 --method flow，其余参数相同
+python diffusion_baseline.py --method flow --device mps --train_only --out dp_out/flow
+python diffusion_baseline.py --load dp_out/flow/dp_policy.pt --out dp_out/flow
 ```
 
 新的运行输出写到 `nca_out/` 和 `dp_out/`（不纳入版本控制）。
@@ -86,10 +94,10 @@ python diffusion_baseline.py --load dp_out/small/dp_policy.pt --out dp_out/small
 |---|---|
 | `action_nca.py` | NCA 单文件原型：数据生成、模型、训练、闭环评估、画图 |
 | `sweep_steps.py` | 扫描冷启动和再生的 NCA 步数 |
-| `diffusion_baseline.py` | Diffusion Policy 基线，以及 NCA 和 DP 共用的闭环评估 `rollout()` |
+| `diffusion_baseline.py` | Diffusion Policy 基线（扩散 + DDIM，或 `--method flow` 流匹配），以及 NCA 和 DP 共用的闭环评估 `rollout()` |
 | `results/` | NCA 默认参数的基线结果（`metrics.json`、`results.png`、`sweep.txt`、`train_log.txt`） |
 | `results/nca_rerun_local/` | 本机按默认参数重训的 NCA（DP 对比用的就是它） |
-| `results/dp_baseline/` | DP 各配置的对比表、指标、图和日志：`large`、`small`（选定的小模型）、`mid`，以及两个落选的小模型配置 |
+| `results/dp_baseline/` | DP 各配置的对比表、指标、图和日志：`large`、`small`（选定的小模型）、`mid`、流匹配的 `flow_large` 和 `flow_small`，以及两个落选的小模型配置 |
 | `NOTES.md` | 背景、设计理由、全部实验结果和被修正过的判断 |
 | `CLAUDE.md` | 给 Claude Code 的项目说明 |
 

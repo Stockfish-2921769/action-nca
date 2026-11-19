@@ -16,7 +16,7 @@
 
 - `action_nca.py`：单文件原型，包括数据生成、模型、训练、闭环评估和画图。
 - `sweep_steps.py`：加载训练好的隐变量模型，扫描冷启动和再生的 NCA 步数。
-- `diffusion_baseline.py`：同一任务上的 Diffusion Policy 基线（条件 1D U-Net + DDIM），三种执行方式（每次新噪声、固定噪声、SDEdit 式热启动），并用同一套 `rollout()` 评估 `nca_out/` 里的 NCA 模型做对比。输出在 `dp_out/`（已加入 .gitignore）。
+- `diffusion_baseline.py`：同一任务上的 Diffusion Policy 基线（条件 1D U-Net + DDIM，或 `--method flow` 流匹配 + Euler），三种执行方式（每次新噪声、固定噪声、SDEdit 式热启动），并用同一套 `rollout()` 评估 `nca_out/` 里的 NCA 模型做对比。输出在 `dp_out/`（已加入 .gitignore）。
 - `results/`：上一次默认参数运行的 `metrics.json`、`results.png`、`sweep.txt`、`train_log.txt`，作为基线结果保留。
 - `results/nca_rerun_local/`：本机（torch 2.12）按默认参数重训的 NCA 结果；`results/dp_baseline/`：DP 各配置的对比表、指标、图和日志。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
@@ -31,6 +31,7 @@ python action_nca.py --device cuda            # 用 GPU
 python sweep_steps.py --model nca_out/nca_latent.pt
 python diffusion_baseline.py --device mps --train_only   # DP 基线在 Apple GPU 上训练，约 8 分钟
 python diffusion_baseline.py --load dp_out/dp_policy.pt  # 在 CPU 上评估，并和 nca_out/ 里的 NCA 对比
+python diffusion_baseline.py --method flow --device mps --train_only --out dp_out/flow   # 流匹配版本
 ```
 
 macOS 上 PyTorch 的 NNPACK 一维卷积很慢，`diffusion_baseline.py` 里已经关掉了；U-Net 在 CPU 上训练仍然慢（大模型约 0.4 秒一轮），训练用 `--device mps`。

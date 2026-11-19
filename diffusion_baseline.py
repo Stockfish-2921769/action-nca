@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Diffusion Policy 基线：在 action_nca.py 的同一个玩具任务上，用小型 1D 卷积 U-Net + DDIM 生成动作块。
+Diffusion Policy 基线：在 action_nca.py 的同一个玩具任务上，用小型 1D 卷积 U-Net 生成动作块。
+生成方法二选一（--method）：ddim（扩散 + DDIM，原版 Diffusion Policy）或 flow（流匹配 + Euler，π0 一类 VLA 的动作头做法）。
 
 和 NCA 保持一致的部分
   * 同一份示范（make_demos，同一个随机种子）、同样的观测（只有当前位置，加 0.01 的观测噪声）、
@@ -15,6 +16,13 @@ Diffusion Policy 的做法（Chi 等，2023）
   * 推理：DDIM（eta = 0），默认 10 步，x0 裁剪到 [-1, 1]；参数用 EMA 权重。
   * 只用 1 帧观测（原版是 2 帧），这样和 NCA 的输入完全一样。
 
+流匹配（--method flow，rectified flow）
+  * 网络、归一化、训练流程和 EMA 都和 DDIM 版完全相同，只换目标：x_τ = (1 − τ)·噪声 + τ·动作，
+    τ ~ U(0, 1)，网络预测速度 v = 动作 − 噪声；τ 乘以 100 后送进同一个正弦时间嵌入。
+  * 推理：从 τ = 0 的纯噪声出发，用 Euler 法等间隔积分到 τ = 1（--ddim_steps 此时就是 Euler 步数）。
+  * 热启动：把上一段计划插值到 τ = 1 − warm_t / 100（默认 0.5，信噪比和 DDIM 在第 50 步时接近），
+    再积分 --warm_steps 步。
+
 评估的执行方式
   * ddim_fresh：每次规划都重新采噪声（原版 Diffusion Policy 的做法）。
   * ddim_fixed：每个回合开头采一份噪声，之后每次规划都用它（对应 NCA 的 cold_fixed）。
@@ -28,6 +36,8 @@ Diffusion Policy 的做法（Chi 等，2023）
   python diffusion_baseline.py --load dp_out/dp_policy.pt   # 只评估（默认在 CPU 上）
   # 和 NCA 每步算力相当的小模型（每次调用约 0.19 M 乘加）：通道少时 GroupNorm 必须减到 2 组，否则训练不起来
   python diffusion_baseline.py --dims 8 16 32 --kernel 3 --t_dim 16 --groups 2 --lr 2e-3 --out dp_out/small_g2_lr2e-3
+  # 流匹配版本：加 --method flow，其余参数相同
+  python diffusion_baseline.py --method flow --device mps --train_only --out dp_out/flow
 输出在 --out 目录（默认 ./dp_out）：metrics.json、compare.md、results_dp.png、dp_policy.pt。
 """
 import argparse
@@ -170,10 +180,55 @@ class DiffusionPolicy(nn.Module):
                 frames.append(self.unnorm(x0.transpose(1, 2)).cpu().numpy())
         return self.unnorm(x.transpose(1, 2))
 
-    def noised(self, plan, t, eps):
-        """把一段计划（B, T_P, 2）加噪到扩散步 t。"""
-        a = self.ac[t]
+    def schedule(self, steps, spacing="leading"):
+        """冷启动的去噪时间表；列表长度 = 网络调用次数。"""
+        return ddim_timesteps(self.n_train, steps, spacing)
+
+    def warm_schedule(self, warm_t, warm_steps):
+        return [int(round(v)) for v in np.linspace(warm_t, 0, warm_steps + 1)[:-1]]
+
+    def noised(self, plan, sched, eps):
+        """把一段计划（B, T_P, 2）加噪到时间表的起点（扩散步 sched[0]）。"""
+        a = self.ac[sched[0]]
         return a.sqrt() * self.norm(plan).transpose(1, 2) + (1 - a).sqrt() * eps
+
+
+class FlowPolicy(DiffusionPolicy):
+    """流匹配（rectified flow）。x_τ = (1 − τ)·噪声 + τ·动作，网络预测速度 v = 动作 − 噪声；
+    推理从 τ = 0 的纯噪声出发，Euler 法积分到 τ = 1。网络和归一化与 DDIM 版相同（ac 缓冲区不用）。"""
+
+    def loss(self, obs, tgt):
+        x1 = self.norm(tgt).transpose(1, 2)                  # (B, 2, T_P)
+        x0 = torch.randn_like(x1)
+        tau = torch.rand(x1.shape[0], device=x1.device)
+        xt = (1 - tau.view(-1, 1, 1)) * x0 + tau.view(-1, 1, 1) * x1
+        return F.mse_loss(self.net(xt, tau * self.n_train, self.norm(obs)), x1 - x0)
+
+    def schedule(self, steps, spacing=None):
+        """等间隔 Euler 步：[(τ_0, τ_1), (τ_1, τ_2), …]，长度 = 网络调用次数。"""
+        g = np.linspace(0.0, 1.0, steps + 1)
+        return list(zip(g[:-1], g[1:]))
+
+    def warm_schedule(self, warm_t, warm_steps):
+        g = np.linspace(1.0 - warm_t / self.n_train, 1.0, warm_steps + 1)
+        return list(zip(g[:-1], g[1:]))
+
+    @torch.no_grad()
+    def denoise(self, x, obs, sched, frames=None):
+        c = self.norm(obs)
+        for a, b in sched:
+            v = self.net(x, torch.full((x.shape[0],), a * self.n_train, device=x.device), c)
+            if frames is not None:                           # 当前对终点的一步预测，对应 DDIM 的 x0
+                frames.append(self.unnorm((x + (1 - a) * v).clamp(-1, 1).transpose(1, 2)).cpu().numpy())
+            x = x + (b - a) * v
+        return self.unnorm(x.clamp(-1, 1).transpose(1, 2))
+
+    def noised(self, plan, sched, eps):
+        tau = sched[0][0]
+        return (1 - tau) * eps + tau * self.norm(plan).transpose(1, 2)
+
+
+POLICIES = {"ddim": DiffusionPolicy, "flow": FlowPolicy}
 
 
 # ----------------------------------------------------------------------------- 训练
@@ -182,7 +237,7 @@ def train_dp(demos, args, dev):
     torch.manual_seed(args.seed)
     D = torch.from_numpy(demos).to(dev)
     flat = D.reshape(-1, 2)
-    policy = DiffusionPolicy(flat.min(0).values, flat.max(0).values, dims=args.dims, k=args.kernel,
+    policy = POLICIES[args.method](flat.min(0).values, flat.max(0).values, dims=args.dims, k=args.kernel,
                              t_dim=args.t_dim, groups=args.groups).to(dev)
     ema = copy.deepcopy(policy).requires_grad_(False)
     opt = torch.optim.AdamW(policy.parameters(), lr=args.lr, weight_decay=1e-6)
@@ -218,8 +273,8 @@ class DPPlanner:
 
     def __init__(self, policy, mode, steps, spacing, warm_t=50, warm_steps=3):
         self.p, self.mode = policy, mode
-        self.ts = ddim_timesteps(policy.n_train, steps, spacing)
-        self.warm_ts = [int(round(v)) for v in np.linspace(warm_t, 0, warm_steps + 1)[:-1]]
+        self.ts = policy.schedule(steps, spacing)
+        self.warm_ts = policy.warm_schedule(warm_t, warm_steps)
 
     def reset(self, E, dev):
         self.E, self.dev, self.prev, self.calls = E, dev, None, 0
@@ -228,7 +283,7 @@ class DPPlanner:
     def plan(self, obs):
         if self.mode == "warm" and self.prev is not None:
             prev = torch.cat([self.prev[:, T_A:], self.prev[:, -1:].expand(-1, T_A, -1)], dim=1)
-            x = self.p.noised(prev, self.warm_ts[0], torch.randn(self.E, 2, T_P, device=self.dev))
+            x = self.p.noised(prev, self.warm_ts, torch.randn(self.E, 2, T_P, device=self.dev))
             ts = self.warm_ts
         else:
             x = self.noise if self.mode == "fixed" else torch.randn(self.E, 2, T_P, device=self.dev)
@@ -372,7 +427,7 @@ def n_params(m):
 
 # ----------------------------------------------------------------------------- 画图
 
-def plot(results, demos, frames, offsets, nca_offsets, sweep, path):
+def plot(results, demos, frames, offsets, nca_offsets, sweep, path, label="Diffusion Policy (DDIM)"):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -396,7 +451,7 @@ def plot(results, demos, frames, offsets, nca_offsets, sweep, path):
             ax.plot(p[:, 0], p[:, 1], color=color[int(status[e])], lw=1.1, alpha=0.75, zorder=2)
 
     ax = axes.flat[3]
-    scene(ax, "DDIM x0 prediction at each step (two noises)\nlighter = earlier step",
+    scene(ax, f"{label}: predicted final plan at each step (two noises)\nlighter = earlier step",
           lim=((-0.55, 0.55), (-0.95, -0.1)))
     for j in range(frames.shape[0]):
         a = 0.15 + 0.85 * j / max(1, frames.shape[0] - 1)
@@ -404,7 +459,7 @@ def plot(results, demos, frames, offsets, nca_offsets, sweep, path):
             ax.plot(frames[j, i, :, 0], frames[j, i, :, 1], "-o", color=c, alpha=a, ms=2.5, lw=1.2)
 
     ax = axes.flat[4]
-    ax.hist(offsets, bins=60, range=(-0.5, 0.5), color="#378ADD", alpha=0.7, label="Diffusion Policy (DDIM)")
+    ax.hist(offsets, bins=60, range=(-0.5, 0.5), color="#378ADD", alpha=0.7, label=label)
     if nca_offsets is not None:
         ax.hist(nca_offsets, bins=60, range=(-0.5, 0.5), color="#1D9E75", alpha=0.5, label="latent NCA")
     ax.set_xlabel("lateral offset of the first plan's last waypoint")
@@ -436,6 +491,7 @@ def fmt(m):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--method", choices=["ddim", "flow"], default="ddim", help="扩散 + DDIM，或流匹配 + Euler")
     ap.add_argument("--iters", type=int, default=6000)
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--lr", type=float, default=5e-4)
@@ -446,7 +502,7 @@ def main():
     ap.add_argument("--t_dim", type=int, default=64, help="扩散时间步嵌入的维度")
     ap.add_argument("--groups", type=int, default=8, help="GroupNorm 的组数；通道很少时应调小")
     ap.add_argument("--obs_noise", type=float, default=0.01)
-    ap.add_argument("--ddim_steps", type=int, default=10)
+    ap.add_argument("--ddim_steps", type=int, default=10, help="冷启动的采样步数（flow 时是 Euler 步数）")
     ap.add_argument("--spacing", choices=["leading", "trailing"], default="leading")
     ap.add_argument("--warm_t", type=int, default=50, help="热启动时把上一段计划加噪到第几个扩散步（共 100）")
     ap.add_argument("--warm_steps", type=int, default=3, help="热启动时的 DDIM 步数")
@@ -475,12 +531,13 @@ def main():
         args.iters, args.batch = ck.get("iters", args.iters), ck.get("batch", args.batch)
         args.dims, args.kernel, args.t_dim = tuple(ck["dims"]), ck["kernel"], ck.get("t_dim", 64)
         args.groups, args.lr = ck.get("groups", 8), ck.get("lr", args.lr)
-        policy = DiffusionPolicy(ck["lo"], ck["hi"], dims=args.dims, k=args.kernel, t_dim=args.t_dim, groups=args.groups)
+        args.method = ck.get("method", "ddim")
+        policy = POLICIES[args.method](ck["lo"], ck["hi"], dims=args.dims, k=args.kernel, t_dim=args.t_dim, groups=args.groups)
         policy.load_state_dict(ck["state"])
     else:
         policy = train_dp(demos, args, torch.device(args.device)).cpu()
         torch.save(dict(state=policy.state_dict(), lo=policy.lo, hi=policy.hi, dims=args.dims, kernel=args.kernel, t_dim=args.t_dim,
-                        groups=args.groups, lr=args.lr,
+                        groups=args.groups, lr=args.lr, method=args.method,
                         iters=args.iters, batch=args.batch),
                    os.path.join(args.out, "dp_policy.pt"))
         if args.train_only:
@@ -489,12 +546,13 @@ def main():
     eval_seed = args.seed + 1                 # 和 action_nca.py 评估时用的种子一致
     E, MS = args.episodes, args.max_steps
     dp_macs = dp_macs_per_call(policy, dev)
+    tag, solver = ("DP", "DDIM") if args.method == "ddim" else ("FM", "Euler")
 
     # ---- Diffusion Policy 的三种执行方式
     print()
-    dp_settings = [(f"DP, DDIM {args.ddim_steps}, new noise each plan", "fresh"),
-                   (f"DP, DDIM {args.ddim_steps}, same noise", "fixed"),
-                   (f"DP, warm start (t={args.warm_t}, {args.warm_steps} steps)", "warm")]
+    dp_settings = [(f"{tag}, {solver} {args.ddim_steps}, new noise each plan", "fresh"),
+                   (f"{tag}, {solver} {args.ddim_steps}, same noise", "fixed"),
+                   (f"{tag}, warm start (t={args.warm_t}, {args.warm_steps} steps)", "warm")]
     results, rows = {}, []
     for name, mode in dp_settings:
         pl = DPPlanner(policy, mode, args.ddim_steps, args.spacing, args.warm_t, args.warm_steps)
@@ -534,11 +592,11 @@ def main():
                                                SimpleNamespace(z_dim=4, cold_steps=32), dev)[0]
 
     # ---- 起点处第一段计划的分布
-    ts = ddim_timesteps(policy.n_train, args.ddim_steps, args.spacing)
+    ts = policy.schedule(args.ddim_steps, args.spacing)
     offsets, noise = dp_first_plan(policy, ts, dev)
     first = dict(left=float(np.mean(offsets < -0.05)), right=float(np.mean(offsets > 0.05)),
                  undecided=float(np.mean(np.abs(offsets) <= 0.05)))
-    print(f"\nfirst plan at start (DP): left {first['left']:.1%}, right {first['right']:.1%},"
+    print(f"\nfirst plan at start ({tag}): left {first['left']:.1%}, right {first['right']:.1%},"
           f" undecided {first['undecided']:.1%}")
     frames = []
     pick = torch.stack([noise[int(np.argmin(offsets))], noise[int(np.argmax(offsets))]])
@@ -548,15 +606,15 @@ def main():
     sweep = {}
     if not args.no_sweep:
         print("\n步数扫描：")
-        for sp in ("leading", "trailing"):
-            key = f"DP fresh noise, {sp}"
+        for sp in (("leading", "trailing") if args.method == "ddim" else ("uniform",)):
+            key = f"{tag} fresh noise, {sp}"
             sweep[key] = []
             for st in (1, 2, 3, 5, 10, 20):
                 m = rollout(DPPlanner(policy, "fresh", st, sp), E, MS, dev, eval_seed)[0]
                 sweep[key].append((m["calls_per_plan"], m["success"]))
                 print(f"  {key:28s} ddim_steps={st:2d}  success={m['success']:.3f}  collision={m['collision']:.3f}"
                       f"  flips={m['plan_flips']:.2f}  roughness={m['roughness_x100']:.2f}", flush=True)
-        key = f"DP warm start (t={args.warm_t})"
+        key = f"{tag} warm start (t={args.warm_t})"
         sweep[key] = []
         for ws in (1, 2, 3, 5):
             m = rollout(DPPlanner(policy, "warm", args.ddim_steps, args.spacing, args.warm_t, ws), E, MS, dev, eval_seed)[0]
@@ -582,7 +640,7 @@ def main():
     with open(os.path.join(args.out, "metrics.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
     lines = [f"训练种子 {args.seed}，评估种子 {eval_seed}，每种方式 {E} 回合。"
-             f"DP：{args.iters} 轮，batch {args.batch}，U-Net {args.dims}（卷积核 {args.kernel}，时间嵌入 {args.t_dim}，GroupNorm {args.groups} 组，学习率 {args.lr:g}），{n_params(policy.net):,} 参数，"
+             f"{tag}（{'扩散 + DDIM' if args.method == 'ddim' else '流匹配 + Euler'}）：{args.iters} 轮，batch {args.batch}，U-Net {args.dims}（卷积核 {args.kernel}，时间嵌入 {args.t_dim}，GroupNorm {args.groups} 组，学习率 {args.lr:g}），{n_params(policy.net):,} 参数，"
              f"每次调用 {dp_macs / 1e6:.2f} M 乘加。"
              + (f"NCA：{n_params(nca['latent']):,} 参数，每步 {nca_macs / 1e3:.0f} K 乘加。" if nca else ""), "",
              "| 执行方式 | 成功率 | 碰撞率 | 成功回合中左/右 | 每回合计划翻转 | 路径粗糙度 | 最大拐折 | 每次规划的网络调用 | 每次规划的乘加 (M) | 每次规划耗时 (ms, 200 回合一批) |",
@@ -593,7 +651,8 @@ def main():
                      f"{m['macs_per_plan'] / 1e6:.2f} | {m['ms_per_plan']:.1f} |")
     with open(os.path.join(args.out, "compare.md"), "w") as f:
         f.write("\n".join(lines) + "\n")
-    plot(results, demos, np.stack(frames), offsets, nca_offsets, sweep, os.path.join(args.out, "results_dp.png"))
+    plot(results, demos, np.stack(frames), offsets, nca_offsets, sweep, os.path.join(args.out, "results_dp.png"),
+         label=f"{tag} ({solver})")
     print(f"\nsaved to {args.out}/")
 
 

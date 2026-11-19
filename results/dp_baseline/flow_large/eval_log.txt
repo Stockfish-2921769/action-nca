@@ -1,0 +1,31 @@
+
+FM, Euler 10, new noise each plan             success=1  collision=0  timeout=0  left=89  right=111  plan_flips=1.14  roughness_x100=1.24  max_kink_x100=4.33  calls_per_plan=10  ms_per_plan=421  macs_per_plan=4.7e+07
+FM, Euler 10, same noise                      success=1  collision=0  timeout=0  left=83  right=117  plan_flips=0.275  roughness_x100=1.22  max_kink_x100=3.37  calls_per_plan=10  ms_per_plan=457  macs_per_plan=4.7e+07
+FM, warm start (t=50, 3 steps)                success=1  collision=0  timeout=0  left=95  right=105  plan_flips=0.27  roughness_x100=1.41  max_kink_x100=4.81  calls_per_plan=3.54  ms_per_plan=161  macs_per_plan=1.66e+07
+NCA, deterministic, cold start                success=0.88  collision=0.12  timeout=0  left=85  right=91  plan_flips=0  roughness_x100=1.45  max_kink_x100=4.14  calls_per_plan=32  ms_per_plan=65.8  macs_per_plan=5.58e+06
+NCA, latent z, cold start, new z each plan    success=0.81  collision=0.19  timeout=0  left=103  right=59  plan_flips=1.3  roughness_x100=1.61  max_kink_x100=5.34  calls_per_plan=32  ms_per_plan=65.5  macs_per_plan=5.58e+06
+NCA, latent z, cold start, same z             success=0.965  collision=0.035  timeout=0  left=100  right=93  plan_flips=0.08  roughness_x100=1.59  max_kink_x100=4.28  calls_per_plan=32  ms_per_plan=65  macs_per_plan=5.58e+06
+NCA, latent z, warm start (regrow)            success=0.99  collision=0.01  timeout=0  left=102  right=96  plan_flips=0.01  roughness_x100=1.92  max_kink_x100=5.62  calls_per_plan=11.7  ms_per_plan=23.9  macs_per_plan=2.04e+06
+
+核对 rollout 与 action_nca.run_episodes（latent warm）：一致
+
+first plan at start (FM): left 46.9%, right 51.4%, undecided 1.6%
+
+步数扫描：
+  FM fresh noise, uniform      ddim_steps= 1  success=0.915  collision=0.085  flips=0.25  roughness=7.26
+  FM fresh noise, uniform      ddim_steps= 2  success=0.985  collision=0.015  flips=1.01  roughness=2.78
+  FM fresh noise, uniform      ddim_steps= 3  success=1.000  collision=0.000  flips=1.08  roughness=2.15
+  FM fresh noise, uniform      ddim_steps= 5  success=1.000  collision=0.000  flips=1.12  roughness=1.63
+  FM fresh noise, uniform      ddim_steps=10  success=1.000  collision=0.000  flips=1.14  roughness=1.24
+  FM fresh noise, uniform      ddim_steps=20  success=0.995  collision=0.005  flips=1.18  roughness=1.13
+  FM warm start (t=50)         warm_steps=1  calls/plan=1.7  success=0.995  collision=0.005  flips=0.32  roughness=2.61
+  FM warm start (t=50)         warm_steps=2  calls/plan=2.7  success=1.000  collision=0.000  flips=0.28  roughness=1.73
+  FM warm start (t=50)         warm_steps=3  calls/plan=3.5  success=1.000  collision=0.000  flips=0.27  roughness=1.41
+  FM warm start (t=50)         warm_steps=5  calls/plan=5.4  success=1.000  collision=0.000  flips=0.24  roughness=1.20
+  NCA regrow                   warm_steps= 2  calls/plan=3.7  success=0.535  roughness=6.21
+  NCA regrow                   warm_steps= 4  calls/plan=6.0  success=0.980  roughness=3.56
+  NCA regrow                   warm_steps= 6  calls/plan=8.0  success=0.980  roughness=2.57
+  NCA regrow                   warm_steps=10  calls/plan=11.7  success=0.990  roughness=1.92
+  NCA regrow                   warm_steps=14  calls/plan=15.4  success=0.990  roughness=1.87
+
+saved to dp_out/flow/
