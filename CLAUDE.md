@@ -19,6 +19,7 @@
 - `diffusion_baseline.py`：同一任务上的 Diffusion Policy 基线（条件 1D U-Net + DDIM，或 `--method flow` 流匹配 + Euler），三种执行方式（每次新噪声、固定噪声、SDEdit 式热启动），并用同一套 `rollout()` 评估 `nca_out/` 里的 NCA 模型做对比。输出在 `dp_out/`（已加入 .gitignore）。
 - `results/`：上一次默认参数运行的 `metrics.json`、`results.png`、`sweep.txt`、`train_log.txt`，作为基线结果保留。
 - `results/nca_rerun_local/`：本机（torch 2.12）按默认参数重训的 NCA 结果；`results/dp_baseline/`：DP 各配置的对比表、指标、图和日志。
+- `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
 
@@ -32,6 +33,7 @@ python sweep_steps.py --model nca_out/nca_latent.pt
 python diffusion_baseline.py --device mps --train_only   # DP 基线在 Apple GPU 上训练，约 8 分钟
 python diffusion_baseline.py --load dp_out/dp_policy.pt  # 在 CPU 上评估，并和 nca_out/ 里的 NCA 对比
 python diffusion_baseline.py --method flow --device mps --train_only --out dp_out/flow   # 流匹配版本
+python multi_seed.py                                     # 多种子实验，约 1 小时；中断后重跑会跳过已完成的步骤
 ```
 
 macOS 上 PyTorch 的 NNPACK 一维卷积很慢，`diffusion_baseline.py` 里已经关掉了；U-Net 在 CPU 上训练仍然慢（大模型约 0.4 秒一轮），训练用 `--device mps`。
@@ -58,6 +60,6 @@ macOS 上 PyTorch 的 NNPACK 一维卷积很慢，`diffusion_baseline.py` 里已
 ## 下一步（按优先级）
 
 1. ~~Diffusion Policy 基线~~：已完成（`diffusion_baseline.py`，结果见 NOTES.md 第 9 节）。DP 在成功率和算力上都不输 NCA，NCA 只在计划翻转（模态一致性）上明显更好。
-2. 用多个随机种子重复主要实验（NCA 和 DP 都要），给出均值和波动范围。单种子下差异已经很明显：本机重训的确定性 NCA 左/右是 85/91，基线是 129/56。
+2. ~~多种子~~：已完成（`multi_seed.py`，结果见 NOTES.md 第 11 节）。第 9 节的结论在 5 个种子上都成立；流匹配还没有做多种子。
 3. 随机化障碍和目标的位置，检验泛化。
 4. 迁移到带图像观测的 Push-T。

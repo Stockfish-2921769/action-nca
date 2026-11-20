@@ -1,0 +1,768 @@
+{
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "hypotheses": {
+    "H1": {
+      "text": "NCA 再生的计划翻转 < 小 DP 热启动（3 步）",
+      "holds": 5,
+      "of": 5,
+      "per_seed": {
+        "0": "0.004 对 0.288",
+        "1": "0.000 对 0.282",
+        "2": "0.010 对 0.220",
+        "3": "0.008 对 0.264",
+        "4": "0.012 对 0.282"
+      }
+    },
+    "H2": {
+      "text": "每次重新采随机性时，NCA 碰撞率 > 小 DP",
+      "holds": 5,
+      "of": 5,
+      "per_seed": {
+        "0": "20.0% 对 1.8%",
+        "1": "16.8% 对 1.8%",
+        "2": "20.2% 对 1.6%",
+        "3": "12.2% 对 2.4%",
+        "4": "18.4% 对 3.0%"
+      }
+    },
+    "H3.1": {
+      "text": "小 DP 热启动 1 步的成功率 ≥ NCA 再生续长 4 步",
+      "holds": 4,
+      "of": 5,
+      "per_seed": {
+        "0": "97.2%（1.6 次）对 97.4%（5.9 次）",
+        "1": "96.8%（1.7 次）对 95.2%（6.0 次）",
+        "2": "97.2%（1.6 次）对 96.4%（5.8 次）",
+        "3": "98.0%（1.6 次）对 97.4%（6.0 次）",
+        "4": "97.6%（1.6 次）对 94.0%（6.0 次）"
+      }
+    },
+    "H3.2": {
+      "text": "小 DP 热启动 2 步的成功率 ≥ NCA 再生续长 4 步",
+      "holds": 5,
+      "of": 5,
+      "per_seed": {
+        "0": "99.6%（2.6 次）对 97.4%（5.9 次）",
+        "1": "100.0%（2.6 次）对 95.2%（6.0 次）",
+        "2": "100.0%（2.6 次）对 96.4%（5.8 次）",
+        "3": "99.8%（2.6 次）对 97.4%（6.0 次）",
+        "4": "100.0%（2.6 次）对 94.0%（6.0 次）"
+      }
+    },
+    "H4": {
+      "text": "确定性 NCA 偏向哪边不受控：左右失衡 > 隐变量再生的左右失衡",
+      "holds": 3,
+      "of": 5,
+      "per_seed": {
+        "0": "左/右 208/242",
+        "1": "左/右 304/176",
+        "2": "左/右 9/480",
+        "3": "左/右 280/204",
+        "4": "左/右 38/450"
+      }
+    },
+    "H5 隐变量 NCA": {
+      "text": "隐变量 NCA：起点处第一段计划双峰（未决 < 5%，左右各 > 35%）",
+      "holds": 4,
+      "of": 5,
+      "per_seed": {
+        "0": "51%/46%/2.1%",
+        "1": "47%/48%/4.5%",
+        "2": "43%/52%/5.0%",
+        "3": "43%/54%/2.4%",
+        "4": "44%/53%/3.5%"
+      }
+    },
+    "H5 小 DP": {
+      "text": "小 DP：起点处第一段计划双峰（未决 < 5%，左右各 > 35%）",
+      "holds": 5,
+      "of": 5,
+      "per_seed": {
+        "0": "46%/50%/3.5%",
+        "1": "47%/49%/4.1%",
+        "2": "49%/48%/3.1%",
+        "3": "45%/51%/3.5%",
+        "4": "50%/46%/4.0%"
+      }
+    }
+  },
+  "det_left_majority": 2,
+  "settings": {
+    "DP 小，每次新噪声": {
+      "0": {
+        "success": 0.982,
+        "collision": 0.018,
+        "timeout": 0.0,
+        "left": 242,
+        "right": 249,
+        "plan_flips": 1.14,
+        "roughness_x100": 1.389674186706543,
+        "max_kink_x100": 7.114809989929199,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 275.4008300745717,
+        "macs_per_plan": 1895680.0
+      },
+      "1": {
+        "success": 0.982,
+        "collision": 0.018,
+        "timeout": 0.0,
+        "left": 268,
+        "right": 223,
+        "plan_flips": 1.174,
+        "roughness_x100": 1.2994903326034546,
+        "max_kink_x100": 6.05876350402832,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 343.4227275395712,
+        "macs_per_plan": 1895680.0
+      },
+      "2": {
+        "success": 0.984,
+        "collision": 0.016,
+        "timeout": 0.0,
+        "left": 226,
+        "right": 266,
+        "plan_flips": 1.114,
+        "roughness_x100": 1.3029439449310303,
+        "max_kink_x100": 5.930607318878174,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 193.68921169147004,
+        "macs_per_plan": 1895680.0
+      },
+      "3": {
+        "success": 0.976,
+        "collision": 0.024,
+        "timeout": 0.0,
+        "left": 241,
+        "right": 247,
+        "plan_flips": 1.12,
+        "roughness_x100": 1.537014365196228,
+        "max_kink_x100": 9.763910293579102,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 204.99436530763677,
+        "macs_per_plan": 1895680.0
+      },
+      "4": {
+        "success": 0.97,
+        "collision": 0.03,
+        "timeout": 0.0,
+        "left": 263,
+        "right": 222,
+        "plan_flips": 1.148,
+        "roughness_x100": 1.4684516191482544,
+        "max_kink_x100": 7.190240383148193,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 196.78261530890057,
+        "macs_per_plan": 1895680.0
+      }
+    },
+    "DP 小，固定噪声": {
+      "0": {
+        "success": 0.982,
+        "collision": 0.018,
+        "timeout": 0.0,
+        "left": 230,
+        "right": 261,
+        "plan_flips": 0.212,
+        "roughness_x100": 1.292756199836731,
+        "max_kink_x100": 3.765244722366333,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 287.7301640010046,
+        "macs_per_plan": 1895680.0
+      },
+      "1": {
+        "success": 0.992,
+        "collision": 0.006,
+        "timeout": 0.002,
+        "left": 269,
+        "right": 227,
+        "plan_flips": 0.274,
+        "roughness_x100": 1.25802481174469,
+        "max_kink_x100": 3.5510611534118652,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 342.34928477962967,
+        "macs_per_plan": 1895680.0
+      },
+      "2": {
+        "success": 0.99,
+        "collision": 0.01,
+        "timeout": 0.0,
+        "left": 229,
+        "right": 266,
+        "plan_flips": 0.212,
+        "roughness_x100": 1.2842963933944702,
+        "max_kink_x100": 3.784085512161255,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 193.356362707324,
+        "macs_per_plan": 1895680.0
+      },
+      "3": {
+        "success": 0.982,
+        "collision": 0.012,
+        "timeout": 0.006,
+        "left": 260,
+        "right": 231,
+        "plan_flips": 0.236,
+        "roughness_x100": 1.4508000612258911,
+        "max_kink_x100": 4.267089366912842,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 197.22381011201327,
+        "macs_per_plan": 1895680.0
+      },
+      "4": {
+        "success": 0.992,
+        "collision": 0.008,
+        "timeout": 0.0,
+        "left": 260,
+        "right": 236,
+        "plan_flips": 0.264,
+        "roughness_x100": 1.2991058826446533,
+        "max_kink_x100": 3.692004442214966,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 228.6361347642549,
+        "macs_per_plan": 1895680.0
+      }
+    },
+    "DP 小，热启动（3 步）": {
+      "0": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 240,
+        "right": 260,
+        "plan_flips": 0.288,
+        "roughness_x100": 2.2643213272094727,
+        "max_kink_x100": 8.627419471740723,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 102.10920830454248,
+        "macs_per_plan": 670779.0769230769
+      },
+      "1": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 243,
+        "right": 257,
+        "plan_flips": 0.282,
+        "roughness_x100": 2.048738956451416,
+        "max_kink_x100": 6.982116222381592,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 121.24308346000572,
+        "macs_per_plan": 670779.0769230769
+      },
+      "2": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 262,
+        "right": 238,
+        "plan_flips": 0.22,
+        "roughness_x100": 2.0356786251068115,
+        "max_kink_x100": 7.209959506988525,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 70.70686207533491,
+        "macs_per_plan": 670779.0769230769
+      },
+      "3": {
+        "success": 0.998,
+        "collision": 0.002,
+        "timeout": 0.0,
+        "left": 277,
+        "right": 222,
+        "plan_flips": 0.264,
+        "roughness_x100": 2.186532497406006,
+        "max_kink_x100": 9.858263969421387,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 68.00062507570077,
+        "macs_per_plan": 670779.0769230769
+      },
+      "4": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 254,
+        "right": 246,
+        "plan_flips": 0.282,
+        "roughness_x100": 2.139139413833618,
+        "max_kink_x100": 7.500862121582031,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 79.27731099950437,
+        "macs_per_plan": 670779.0769230769
+      }
+    },
+    "DP 大，每次新噪声": {
+      "0": {
+        "success": 0.992,
+        "collision": 0.008,
+        "timeout": 0.0,
+        "left": 263,
+        "right": 233,
+        "plan_flips": 1.172,
+        "roughness_x100": 1.1321691274642944,
+        "max_kink_x100": 5.309534072875977,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 949.1294520759346,
+        "macs_per_plan": 46965760.0
+      },
+      "1": {
+        "success": 0.988,
+        "collision": 0.012,
+        "timeout": 0.0,
+        "left": 269,
+        "right": 225,
+        "plan_flips": 1.176,
+        "roughness_x100": 1.0954021215438843,
+        "max_kink_x100": 4.532876014709473,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 981.0662886134546,
+        "macs_per_plan": 46965760.0
+      },
+      "2": {
+        "success": 0.996,
+        "collision": 0.004,
+        "timeout": 0.0,
+        "left": 229,
+        "right": 269,
+        "plan_flips": 1.108,
+        "roughness_x100": 1.092991828918457,
+        "max_kink_x100": 4.755794048309326,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 983.5419550766417,
+        "macs_per_plan": 46965760.0
+      },
+      "3": {
+        "success": 0.998,
+        "collision": 0.002,
+        "timeout": 0.0,
+        "left": 236,
+        "right": 263,
+        "plan_flips": 1.162,
+        "roughness_x100": 1.106325626373291,
+        "max_kink_x100": 5.057562351226807,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 1042.9093399232863,
+        "macs_per_plan": 46965760.0
+      },
+      "4": {
+        "success": 0.996,
+        "collision": 0.004,
+        "timeout": 0.0,
+        "left": 269,
+        "right": 229,
+        "plan_flips": 1.188,
+        "roughness_x100": 1.1174522638320923,
+        "max_kink_x100": 4.709726333618164,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 975.9848941556321,
+        "macs_per_plan": 46965760.0
+      }
+    },
+    "DP 大，固定噪声": {
+      "0": {
+        "success": 0.992,
+        "collision": 0.008,
+        "timeout": 0.0,
+        "left": 248,
+        "right": 248,
+        "plan_flips": 0.236,
+        "roughness_x100": 1.10433030128479,
+        "max_kink_x100": 3.4114155769348145,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 966.7266859964002,
+        "macs_per_plan": 46965760.0
+      },
+      "1": {
+        "success": 0.994,
+        "collision": 0.006,
+        "timeout": 0.0,
+        "left": 271,
+        "right": 226,
+        "plan_flips": 0.262,
+        "roughness_x100": 1.093500018119812,
+        "max_kink_x100": 3.1906325817108154,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 976.4922677838642,
+        "macs_per_plan": 46965760.0
+      },
+      "2": {
+        "success": 0.994,
+        "collision": 0.004,
+        "timeout": 0.002,
+        "left": 232,
+        "right": 265,
+        "plan_flips": 0.238,
+        "roughness_x100": 1.0682048797607422,
+        "max_kink_x100": 3.2458853721618652,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 1019.5543286099564,
+        "macs_per_plan": 46965760.0
+      },
+      "3": {
+        "success": 0.996,
+        "collision": 0.004,
+        "timeout": 0.0,
+        "left": 259,
+        "right": 239,
+        "plan_flips": 0.278,
+        "roughness_x100": 1.073736310005188,
+        "max_kink_x100": 3.2993454933166504,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 980.421397178468,
+        "macs_per_plan": 46965760.0
+      },
+      "4": {
+        "success": 0.998,
+        "collision": 0.002,
+        "timeout": 0.0,
+        "left": 267,
+        "right": 232,
+        "plan_flips": 0.306,
+        "roughness_x100": 1.0840880870819092,
+        "max_kink_x100": 3.275597095489502,
+        "calls_per_plan": 10.0,
+        "ms_per_plan": 749.5947277348023,
+        "macs_per_plan": 46965760.0
+      }
+    },
+    "DP 大，热启动（3 步）": {
+      "0": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 241,
+        "right": 259,
+        "plan_flips": 0.3,
+        "roughness_x100": 1.6772862672805786,
+        "max_kink_x100": 6.354644775390625,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 348.72563146144296,
+        "macs_per_plan": 16618653.538461538
+      },
+      "1": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 245,
+        "right": 255,
+        "plan_flips": 0.292,
+        "roughness_x100": 1.6412034034729004,
+        "max_kink_x100": 5.814018249511719,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 346.7228557699575,
+        "macs_per_plan": 16618653.538461538
+      },
+      "2": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 265,
+        "right": 235,
+        "plan_flips": 0.228,
+        "roughness_x100": 1.538674235343933,
+        "max_kink_x100": 5.325118064880371,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 356.86110584580234,
+        "macs_per_plan": 16618653.538461538
+      },
+      "3": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 266,
+        "right": 234,
+        "plan_flips": 0.264,
+        "roughness_x100": 1.5549663305282593,
+        "max_kink_x100": 5.929548263549805,
+        "calls_per_plan": 3.5833333333333335,
+        "ms_per_plan": 348.39600358342676,
+        "macs_per_plan": 16829397.333333336
+      },
+      "4": {
+        "success": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "left": 251,
+        "right": 249,
+        "plan_flips": 0.292,
+        "roughness_x100": 1.6264352798461914,
+        "max_kink_x100": 5.987761497497559,
+        "calls_per_plan": 3.5384615384615383,
+        "ms_per_plan": 263.695118616362,
+        "macs_per_plan": 16618653.538461538
+      }
+    },
+    "NCA 确定性，冷启动": {
+      "0": {
+        "success": 0.9,
+        "collision": 0.1,
+        "timeout": 0.0,
+        "left": 208,
+        "right": 242,
+        "plan_flips": 0.004,
+        "roughness_x100": 1.4758493900299072,
+        "max_kink_x100": 4.314253807067871,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 156.41167374997167,
+        "macs_per_plan": 5582848.0
+      },
+      "1": {
+        "success": 0.96,
+        "collision": 0.04,
+        "timeout": 0.0,
+        "left": 304,
+        "right": 176,
+        "plan_flips": 0.472,
+        "roughness_x100": 1.5015333890914917,
+        "max_kink_x100": 4.245105743408203,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 157.19919441592842,
+        "macs_per_plan": 5582848.0
+      },
+      "2": {
+        "success": 0.978,
+        "collision": 0.022,
+        "timeout": 0.0,
+        "left": 9,
+        "right": 480,
+        "plan_flips": 0.012,
+        "roughness_x100": 1.3954497575759888,
+        "max_kink_x100": 4.380627155303955,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 90.62755138550598,
+        "macs_per_plan": 5582848.0
+      },
+      "3": {
+        "success": 0.968,
+        "collision": 0.032,
+        "timeout": 0.0,
+        "left": 280,
+        "right": 204,
+        "plan_flips": 0.004,
+        "roughness_x100": 1.488401174545288,
+        "max_kink_x100": 4.395979881286621,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 96.4758076902049,
+        "macs_per_plan": 5582848.0
+      },
+      "4": {
+        "success": 0.976,
+        "collision": 0.024,
+        "timeout": 0.0,
+        "left": 38,
+        "right": 450,
+        "plan_flips": 0.052,
+        "roughness_x100": 1.3331066370010376,
+        "max_kink_x100": 4.319005966186523,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 108.77283023168835,
+        "macs_per_plan": 5582848.0
+      }
+    },
+    "NCA 隐变量，每次新 z": {
+      "0": {
+        "success": 0.8,
+        "collision": 0.2,
+        "timeout": 0.0,
+        "left": 239,
+        "right": 161,
+        "plan_flips": 1.334,
+        "roughness_x100": 1.619807481765747,
+        "max_kink_x100": 5.533916473388672,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 158.0906795357945,
+        "macs_per_plan": 5582848.0
+      },
+      "1": {
+        "success": 0.832,
+        "collision": 0.168,
+        "timeout": 0.0,
+        "left": 166,
+        "right": 250,
+        "plan_flips": 1.356,
+        "roughness_x100": 1.677293300628662,
+        "max_kink_x100": 5.565468788146973,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 160.2045801544311,
+        "macs_per_plan": 5582848.0
+      },
+      "2": {
+        "success": 0.798,
+        "collision": 0.202,
+        "timeout": 0.0,
+        "left": 218,
+        "right": 181,
+        "plan_flips": 1.308,
+        "roughness_x100": 1.6072856187820435,
+        "max_kink_x100": 5.201823711395264,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 105.35972753803854,
+        "macs_per_plan": 5582848.0
+      },
+      "3": {
+        "success": 0.878,
+        "collision": 0.122,
+        "timeout": 0.0,
+        "left": 136,
+        "right": 303,
+        "plan_flips": 1.3,
+        "roughness_x100": 1.7424832582473755,
+        "max_kink_x100": 5.524043560028076,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 98.398157000282,
+        "macs_per_plan": 5582848.0
+      },
+      "4": {
+        "success": 0.816,
+        "collision": 0.184,
+        "timeout": 0.0,
+        "left": 175,
+        "right": 233,
+        "plan_flips": 1.236,
+        "roughness_x100": 1.738336443901062,
+        "max_kink_x100": 5.601076126098633,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 109.90891338532002,
+        "macs_per_plan": 5582848.0
+      }
+    },
+    "NCA 隐变量，z 固定": {
+      "0": {
+        "success": 0.958,
+        "collision": 0.042,
+        "timeout": 0.0,
+        "left": 263,
+        "right": 216,
+        "plan_flips": 0.072,
+        "roughness_x100": 1.5754696130752563,
+        "max_kink_x100": 4.266252040863037,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 158.88449114260897,
+        "macs_per_plan": 5582848.0
+      },
+      "1": {
+        "success": 0.956,
+        "collision": 0.044,
+        "timeout": 0.0,
+        "left": 215,
+        "right": 263,
+        "plan_flips": 0.036,
+        "roughness_x100": 1.6105142831802368,
+        "max_kink_x100": 4.22077751159668,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 161.59851622964757,
+        "macs_per_plan": 5582848.0
+      },
+      "2": {
+        "success": 0.976,
+        "collision": 0.024,
+        "timeout": 0.0,
+        "left": 244,
+        "right": 244,
+        "plan_flips": 0.066,
+        "roughness_x100": 1.464211344718933,
+        "max_kink_x100": 3.6672990322113037,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 98.17687830722068,
+        "macs_per_plan": 5582848.0
+      },
+      "3": {
+        "success": 0.968,
+        "collision": 0.032,
+        "timeout": 0.0,
+        "left": 178,
+        "right": 306,
+        "plan_flips": 0.078,
+        "roughness_x100": 1.634418249130249,
+        "max_kink_x100": 4.107046604156494,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 98.67520830728328,
+        "macs_per_plan": 5582848.0
+      },
+      "4": {
+        "success": 0.954,
+        "collision": 0.046,
+        "timeout": 0.0,
+        "left": 228,
+        "right": 249,
+        "plan_flips": 0.066,
+        "roughness_x100": 1.5967252254486084,
+        "max_kink_x100": 4.526355266571045,
+        "calls_per_plan": 32.0,
+        "ms_per_plan": 131.23357742941673,
+        "macs_per_plan": 5582848.0
+      }
+    },
+    "NCA 隐变量，再生": {
+      "0": {
+        "success": 0.988,
+        "collision": 0.012,
+        "timeout": 0.0,
+        "left": 272,
+        "right": 222,
+        "plan_flips": 0.004,
+        "roughness_x100": 1.9080368280410767,
+        "max_kink_x100": 5.505579471588135,
+        "calls_per_plan": 11.692307692307692,
+        "ms_per_plan": 51.41095861528391,
+        "macs_per_plan": 2039886.769230769
+      },
+      "1": {
+        "success": 0.966,
+        "collision": 0.034,
+        "timeout": 0.0,
+        "left": 220,
+        "right": 263,
+        "plan_flips": 0.0,
+        "roughness_x100": 1.9242221117019653,
+        "max_kink_x100": 5.1407904624938965,
+        "calls_per_plan": 11.692307692307692,
+        "ms_per_plan": 60.06905446030522,
+        "macs_per_plan": 2039886.769230769
+      },
+      "2": {
+        "success": 0.972,
+        "collision": 0.028,
+        "timeout": 0.0,
+        "left": 220,
+        "right": 266,
+        "plan_flips": 0.01,
+        "roughness_x100": 1.7756948471069336,
+        "max_kink_x100": 4.835289478302002,
+        "calls_per_plan": 11.692307692307692,
+        "ms_per_plan": 36.34051907619533,
+        "macs_per_plan": 2039886.769230769
+      },
+      "3": {
+        "success": 0.98,
+        "collision": 0.02,
+        "timeout": 0.0,
+        "left": 202,
+        "right": 288,
+        "plan_flips": 0.008,
+        "roughness_x100": 2.012779951095581,
+        "max_kink_x100": 5.429964542388916,
+        "calls_per_plan": 11.833333333333334,
+        "ms_per_plan": 36.652722250437364,
+        "macs_per_plan": 2064490.6666666667
+      },
+      "4": {
+        "success": 0.938,
+        "collision": 0.062,
+        "timeout": 0.0,
+        "left": 193,
+        "right": 276,
+        "plan_flips": 0.012,
+        "roughness_x100": 1.941689133644104,
+        "max_kink_x100": 5.207010269165039,
+        "calls_per_plan": 11.833333333333334,
+        "ms_per_plan": 48.49376049969578,
+        "macs_per_plan": 2064490.6666666667
+      }
+    }
+  }
+}

@@ -468,8 +468,8 @@ def plot(results, demos, frames, offsets, nca_offsets, sweep, path, label="Diffu
 
     ax = axes.flat[5]
     for name, pts in sweep.items():
-        pts = sorted(pts)
-        ax.plot([p[0] for p in pts], [p[1] for p in pts], "-o", ms=4, label=name)
+        pts = sorted(pts, key=lambda p: p["calls_per_plan"])
+        ax.plot([p["calls_per_plan"] for p in pts], [p["success"] for p in pts], "-o", ms=4, label=name)
     ax.set_xscale("log")
     ax.set_xlabel("network calls per plan (log)")
     ax.set_ylabel("success rate")
@@ -518,6 +518,10 @@ def main():
     ap.add_argument("--load", default=None, help="加载已训练的 dp_policy.pt，跳过训练")
     ap.add_argument("--nca_dir", default="nca_out", help="有 nca_det.pt / nca_latent.pt 时一起评估对比")
     ap.add_argument("--no_sweep", action="store_true")
+    ap.add_argument("--sweep_steps", type=int, nargs="+", default=[1, 2, 3, 5, 10, 20], help="扫描冷启动的采样步数")
+    ap.add_argument("--sweep_spacing", nargs="+", default=None, help="扫描哪些时间步间隔（默认 ddim 扫 leading 和 trailing）")
+    ap.add_argument("--sweep_warm", type=int, nargs="+", default=[1, 2, 3, 5], help="扫描热启动的采样步数")
+    ap.add_argument("--sweep_nca", type=int, nargs="+", default=[2, 4, 6, 10, 14], help="扫描 NCA 再生的续长步数")
     ap.add_argument("--out", default="dp_out")
     args = ap.parse_args()
     args.dims = tuple(args.dims)
@@ -606,28 +610,29 @@ def main():
     sweep = {}
     if not args.no_sweep:
         print("\n步数扫描：")
-        for sp in (("leading", "trailing") if args.method == "ddim" else ("uniform",)):
+        spacings = args.sweep_spacing or ((["leading", "trailing"]) if args.method == "ddim" else ["uniform"])
+        for sp in spacings:
             key = f"{tag} fresh noise, {sp}"
             sweep[key] = []
-            for st in (1, 2, 3, 5, 10, 20):
+            for st in args.sweep_steps:
                 m = rollout(DPPlanner(policy, "fresh", st, sp), E, MS, dev, eval_seed)[0]
-                sweep[key].append((m["calls_per_plan"], m["success"]))
+                sweep[key].append(dict(steps=st, **m))
                 print(f"  {key:28s} ddim_steps={st:2d}  success={m['success']:.3f}  collision={m['collision']:.3f}"
                       f"  flips={m['plan_flips']:.2f}  roughness={m['roughness_x100']:.2f}", flush=True)
         key = f"{tag} warm start (t={args.warm_t})"
         sweep[key] = []
-        for ws in (1, 2, 3, 5):
+        for ws in args.sweep_warm:
             m = rollout(DPPlanner(policy, "warm", args.ddim_steps, args.spacing, args.warm_t, ws), E, MS, dev, eval_seed)[0]
-            sweep[key].append((m["calls_per_plan"], m["success"]))
+            sweep[key].append(dict(steps=ws, **m))
             print(f"  {key:28s} warm_steps={ws}  calls/plan={m['calls_per_plan']:.1f}  success={m['success']:.3f}"
                   f"  collision={m['collision']:.3f}  flips={m['plan_flips']:.2f}"
                   f"  roughness={m['roughness_x100']:.2f}", flush=True)
         if "latent" in nca:
             key = "NCA regrow"
             sweep[key] = []
-            for ws in (2, 4, 6, 10, 14):
+            for ws in args.sweep_nca:
                 m = rollout(NCAPlanner(nca["latent"], "latent", "warm", warm_steps=ws), E, MS, dev, eval_seed)[0]
-                sweep[key].append((m["calls_per_plan"], m["success"]))
+                sweep[key].append(dict(steps=ws, **m))
                 print(f"  {key:28s} warm_steps={ws:2d}  calls/plan={m['calls_per_plan']:.1f}"
                       f"  success={m['success']:.3f}  roughness={m['roughness_x100']:.2f}", flush=True)
 
@@ -636,14 +641,14 @@ def main():
                                nca_params=n_params(nca["latent"]) if nca else None, nca_macs_per_step=nca_macs,
                                eval_seed=eval_seed),
                    settings={name: m for name, m in rows}, first_plan_at_start=first,
-                   sweep={k: [list(p) for p in v] for k, v in sweep.items()})
+                   sweep=sweep)
     with open(os.path.join(args.out, "metrics.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
     lines = [f"训练种子 {args.seed}，评估种子 {eval_seed}，每种方式 {E} 回合。"
              f"{tag}（{'扩散 + DDIM' if args.method == 'ddim' else '流匹配 + Euler'}）：{args.iters} 轮，batch {args.batch}，U-Net {args.dims}（卷积核 {args.kernel}，时间嵌入 {args.t_dim}，GroupNorm {args.groups} 组，学习率 {args.lr:g}），{n_params(policy.net):,} 参数，"
              f"每次调用 {dp_macs / 1e6:.2f} M 乘加。"
              + (f"NCA：{n_params(nca['latent']):,} 参数，每步 {nca_macs / 1e3:.0f} K 乘加。" if nca else ""), "",
-             "| 执行方式 | 成功率 | 碰撞率 | 成功回合中左/右 | 每回合计划翻转 | 路径粗糙度 | 最大拐折 | 每次规划的网络调用 | 每次规划的乘加 (M) | 每次规划耗时 (ms, 200 回合一批) |",
+             f"| 执行方式 | 成功率 | 碰撞率 | 成功回合中左/右 | 每回合计划翻转 | 路径粗糙度 | 最大拐折 | 每次规划的网络调用 | 每次规划的乘加 (M) | 每次规划耗时 (ms, {E} 回合一批) |",
              "|---|---|---|---|---|---|---|---|---|---|"]
     for name, m in rows:
         lines.append(f"| {name} | {m['success']:.1%} | {m['collision']:.1%} | {m['left']} / {m['right']} | "
