@@ -21,7 +21,7 @@
 - `results/nca_rerun_local/`：本机（torch 2.12）按默认参数重训的 NCA 结果；`results/dp_baseline/`：DP 各配置的对比表、指标、图和日志。
 - `precision_loss.py`：精度损失实验（`action_nca.py --prec_weight`），成对比较不同权重，汇总复制到 `results/precision_loss/`。
 - `guidance.py`：推理时可微避障引导（interleave 边长边推、post 长完再推），加载 `runs/precision/` 里的模型评估，汇总复制到 `results/guidance/`。
-- `novel_obstacle.py`：测试时新障碍（训练时没见过的圆），NCA 和小 DP 在同样的引导下比较；DP 模型在 `runs/novel/dp_seed<s>/`，汇总复制到 `results/novel_obstacle/`。
+- `novel_obstacle.py`：测试时新障碍（训练时没见过的圆），NCA 和小 DP 在同样的引导下比较（`--proj normal` 只推路径法向分量，结果在 `results/normal_push/`）；DP 模型在 `runs/novel/dp_seed<s>/`，汇总复制到 `results/novel_obstacle/`。
 - `viz_regrow.py`：画第 14 节的图（再生 / 热启动 + interleave 的路径、最大拐折分布、逐种子成功率和拐折增量）。
 - `results/push_training/`：推动训练后 NCA 的指标和新障碍评估（NOTES.md 第 15 节）。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。

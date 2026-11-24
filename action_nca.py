@@ -163,6 +163,16 @@ def plan_cost(plan, obs, circles, margin, n=4):
     return (torch.relu(margin - sdf) ** 2).sum(1)
 
 
+def path_normal(g, plan, obs):
+    """只保留 g 垂直于路径方向的分量。每个航点的路径方向取相邻两点之差（第一个航点用当前位置，
+    最后一个用自己和前一个）；方向长度接近 0（原地不动）的航点保留原梯度。g, plan: (B, T_P, 2)。"""
+    P = torch.cat([obs[:, None], plan, plan[:, -1:]], 1)
+    tan = P[:, 2:] - P[:, :-2]
+    n = tan.norm(dim=-1, keepdim=True)
+    t = torch.where(n > 1e-6, tan / n.clamp(min=1e-6), torch.zeros_like(tan))
+    return g - (g * t).sum(-1, keepdim=True) * t
+
+
 def push(s, obs, circles, eta, margin):
     """沿 −η∇C 推细胞带的动作通道。梯度当作外部输入（不对它求导）。"""
     with torch.enable_grad():

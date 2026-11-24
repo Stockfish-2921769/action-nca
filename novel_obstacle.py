@@ -77,10 +77,11 @@ def circle_hits(circles):
 
 
 class Pusher:
-    """沿 −η∇C 推计划（世界坐标，(E, T_P, 2)）。C 包括矩形障碍和本回合的圆。"""
+    """沿 −η∇C 推计划（世界坐标，(E, T_P, 2)）。C 包括矩形障碍和本回合的圆。
+    proj = "normal" 时只推垂直于路径方向的分量（圆在正前方时，完整梯度几乎全是“向后”的，会顶住机器人）。"""
 
-    def __init__(self, circles, eta, margin):
-        self.c, self.eta, self.margin = torch.from_numpy(circles), eta, margin
+    def __init__(self, circles, eta, margin, proj="full"):
+        self.c, self.eta, self.margin, self.proj = torch.from_numpy(circles), eta, margin, proj
 
     def cost(self, plan, obs):
         return A.plan_cost(plan, obs, self.c, self.margin).sum()
@@ -90,6 +91,8 @@ class Pusher:
             with torch.enable_grad():
                 a = plan.detach().requires_grad_(True)
                 g, = torch.autograd.grad(self.cost(a, obs), a)
+            if self.proj == "normal":
+                g = A.path_normal(g, plan, obs)
             plan = plan - self.eta * g
         return plan
 
@@ -170,7 +173,7 @@ def evaluate(job):
     torch.set_num_threads(1)
     method, setting, scene, guide, eta, seed, a = job
     circles = make_scene(scene, a["episodes"], np.random.default_rng(seed + 100))
-    pusher = Pusher(circles, eta, a["margin"])
+    pusher = Pusher(circles, eta, a["margin"], a["proj"])
     if method == "nca":
         m = A.ActionNCA()
         m.load_state_dict(torch.load(os.path.join(a["nca_models"], f"{a['nca_tag']}_seed{seed}", "nca_latent.pt"), map_location="cpu"))
@@ -180,7 +183,7 @@ def evaluate(job):
     t0 = time.time()
     r = DB.rollout(planner, a["episodes"], 72, "cpu", seed + 1, extra_hit=circle_hits(circles))[0]
     r["seconds"] = time.time() - t0
-    return dict(method=method, setting=setting, scene=scene, guide=guide, eta=eta, seed=seed, **r)
+    return dict(method=method, setting=setting, scene=scene, guide=guide, eta=eta, seed=seed, proj=a["proj"], **r)
 
 
 # ----------------------------------------------------------------------------- 汇总
@@ -192,7 +195,7 @@ def fmt(v, pct):
 
 def aggregate(args, rows):
     L = [f"# 新障碍实验（种子 {', '.join(map(str, args.seeds))}，每种方式 {args.episodes} 回合，评估种子 = 种子 + 1，"
-         f"障碍位置种子 = 种子 + 100，margin {args.margin}）\n",
+         f"障碍位置种子 = 种子 + 100，margin {args.margin}，推动方向 {args.proj}）\n",
          "NCA：精度损失权重 1 的隐变量模型（训练 1500 轮）；DP：小 DP（6000 轮，DDIM 10 步，热启动 t=50、3 步）。"
          f"引导的梯度步数：冷启动 {COLD_PUSH} 次，再生 / 热启动 {WARM_PUSH} 次。单元格是 5 个种子的均值 ± 标准差。\n"]
     for scene in args.scenes:
@@ -226,6 +229,8 @@ def main():
     ap.add_argument("--etas", type=float, nargs="+", default=[0.1, 0.3, 1.0])
     ap.add_argument("--methods", nargs="+", default=["nca", "dp"])
     ap.add_argument("--margin", type=float, default=0.03)
+    ap.add_argument("--proj", choices=["full", "normal"], default="full",
+                    help="full：完整梯度；normal：只推垂直于路径方向的分量")
     ap.add_argument("--episodes", type=int, default=500)
     ap.add_argument("--nca_models", default=os.path.join(HERE, "runs", "precision"))
     ap.add_argument("--nca_tag", default="w1", help="NCA 模型目录名的前缀：<nca_models>/<tag>_seed<s>/")
