@@ -24,6 +24,7 @@
 - `novel_obstacle.py`：测试时新障碍（训练时没见过的圆），NCA 和小 DP 在同样的引导下比较（`--proj normal` 只推路径法向分量，结果在 `results/normal_push/`）；DP 模型在 `runs/novel/dp_seed<s>/`，汇总复制到 `results/novel_obstacle/`。
 - `viz_regrow.py`：画第 14 节的图（再生 / 热启动 + interleave 的路径、最大拐折分布、逐种子成功率和拐折增量）。
 - `results/push_training/`：推动训练后 NCA 的指标和新障碍评估（NOTES.md 第 15 节）。
+- `viz_best.py`：画第 16 节最好的四种组合（路径、逐种子成功率和最大拐折、big 场景里只推法向的作用）。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
