@@ -26,6 +26,7 @@
 - `results/push_training/`：推动训练后 NCA 的指标和新障碍评估（NOTES.md 第 15 节）。
 - `viz_best.py`：画第 16 节最好的四种组合（路径、逐种子成功率和最大拐折、big 场景里只推法向的作用）。
 - `random_obstacle.py`：障碍随机化、策略看见障碍（观测 = 位置 + 4 个障碍参数）；NCA / DP × 看见 / 看不见，in / ood 两组评估障碍。结果在 `results/random_obstacle/`（NOTES.md 第 17 节）。
+- `viz_random.py`：画第 17 节的图（随机障碍下的路径、逐种子成功率 / 拐折 / 计划翻转、看见与看不见的对比）；要在服务器上运行。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
