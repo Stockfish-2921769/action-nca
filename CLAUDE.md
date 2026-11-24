@@ -22,6 +22,7 @@
 - `precision_loss.py`：精度损失实验（`action_nca.py --prec_weight`），成对比较不同权重，汇总复制到 `results/precision_loss/`。
 - `guidance.py`：推理时可微避障引导（interleave 边长边推、post 长完再推），加载 `runs/precision/` 里的模型评估，汇总复制到 `results/guidance/`。
 - `novel_obstacle.py`：测试时新障碍（训练时没见过的圆），NCA 和小 DP 在同样的引导下比较；DP 模型在 `runs/novel/dp_seed<s>/`，汇总复制到 `results/novel_obstacle/`。
+- `viz_regrow.py`：画第 14 节的图（再生 / 热启动 + interleave 的路径、最大拐折分布、逐种子成功率和拐折增量）。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
