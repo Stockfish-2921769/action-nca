@@ -1,0 +1,76 @@
+{
+ "train_minutes": 27.61906240383784,
+ "n_demos": 1000,
+ "in/cold_fresh": {
+  "success": 0.45,
+  "collision": 0.55,
+  "timeout": 0.0,
+  "left": 71,
+  "right": 154,
+  "plan_flips": 1.64,
+  "roughness_x100": 1.739590048789978,
+  "max_kink_x100": 7.739124298095703,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 468.28956285025924
+ },
+ "in/cold_fixed": {
+  "success": 0.57,
+  "collision": 0.428,
+  "timeout": 0.002,
+  "left": 107,
+  "right": 178,
+  "plan_flips": 0.32,
+  "roughness_x100": 1.6722724437713623,
+  "max_kink_x100": 5.06341028213501,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 432.0133404237115
+ },
+ "in/warm": {
+  "success": 0.54,
+  "collision": 0.458,
+  "timeout": 0.002,
+  "left": 125,
+  "right": 145,
+  "plan_flips": 0.504,
+  "roughness_x100": 1.873517632484436,
+  "max_kink_x100": 5.5696563720703125,
+  "calls_per_plan": 11.222222222222221,
+  "ms_per_plan": 142.93715726428977
+ },
+ "ood/cold_fresh": {
+  "success": 0.102,
+  "collision": 0.898,
+  "timeout": 0.0,
+  "left": 15,
+  "right": 36,
+  "plan_flips": 1.424,
+  "roughness_x100": 1.8438336849212646,
+  "max_kink_x100": 7.800281047821045,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 260.9222074000475
+ },
+ "ood/cold_fixed": {
+  "success": 0.356,
+  "collision": 0.642,
+  "timeout": 0.002,
+  "left": 68,
+  "right": 110,
+  "plan_flips": 0.244,
+  "roughness_x100": 1.8364694118499756,
+  "max_kink_x100": 5.5623674392700195,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 212.04666331565628
+ },
+ "ood/warm": {
+  "success": 0.126,
+  "collision": 0.874,
+  "timeout": 0.0,
+  "left": 36,
+  "right": 27,
+  "plan_flips": 0.382,
+  "roughness_x100": 2.1521503925323486,
+  "max_kink_x100": 6.510587215423584,
+  "calls_per_plan": 11.833333333333334,
+  "ms_per_plan": 82.99064775928855
+ }
+}

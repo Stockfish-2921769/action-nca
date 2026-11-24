@@ -143,9 +143,15 @@ def ddim_timesteps(n_train, steps, spacing):
 
 
 class DiffusionPolicy(nn.Module):
-    def __init__(self, lo, hi, dims=(32, 64, 128), k=5, t_dim=64, groups=8, n_train=100):
+    def __init__(self, lo, hi, dims=(32, 64, 128), k=5, t_dim=64, groups=8, n_train=100, cond_lo=None, cond_hi=None):
+        """cond_lo / cond_hi（可选）：条件向量（例如障碍参数）的范围；给出时观测 = 位置 + 条件向量，各自归一化。"""
         super().__init__()
-        self.net = CondUnet1D(dims=dims, k=k, t_dim=t_dim, groups=groups)
+        cd = 0 if cond_lo is None else len(cond_lo)
+        self.net = CondUnet1D(obs_dim=2 + cd, dims=dims, k=k, t_dim=t_dim, groups=groups)
+        if cd:
+            self.register_buffer("clo", torch.as_tensor(cond_lo, dtype=torch.float32))
+            self.register_buffer("chi", torch.as_tensor(cond_hi, dtype=torch.float32))
+        self.cond_dim = cd
         self.n_train = n_train
         self.register_buffer("lo", torch.as_tensor(lo, dtype=torch.float32))
         self.register_buffer("hi", torch.as_tensor(hi, dtype=torch.float32))
@@ -157,17 +163,22 @@ class DiffusionPolicy(nn.Module):
     def unnorm(self, x):
         return (x + 1) / 2 * (self.hi - self.lo) + self.lo
 
+    def norm_obs(self, obs):
+        if not self.cond_dim:
+            return self.norm(obs)
+        return torch.cat([self.norm(obs[:, :2]), 2 * (obs[:, 2:] - self.clo) / (self.chi - self.clo) - 1], 1)
+
     def loss(self, obs, tgt):
         x0 = self.norm(tgt).transpose(1, 2)                  # (B, 2, T_P)
         t = torch.randint(0, self.n_train, (x0.shape[0],), device=x0.device)
         eps = torch.randn_like(x0)
         a = self.ac[t].view(-1, 1, 1)
-        return F.mse_loss(self.net(a.sqrt() * x0 + (1 - a).sqrt() * eps, t, self.norm(obs)), eps)
+        return F.mse_loss(self.net(a.sqrt() * x0 + (1 - a).sqrt() * eps, t, self.norm_obs(obs)), eps)
 
     @torch.no_grad()
     def denoise(self, x, obs, ts, frames=None):
         """DDIM（eta = 0）沿给定的时间步从 x 去噪。x 在归一化空间，形状 (B, 2, T_P)；返回 (B, T_P, 2) 的计划。"""
-        c = self.norm(obs)
+        c = self.norm_obs(obs)
         for i, t in enumerate(ts):
             tt = torch.full((x.shape[0],), t, device=x.device, dtype=torch.long)
             eps = self.net(x, tt, c)
@@ -202,7 +213,7 @@ class FlowPolicy(DiffusionPolicy):
         x0 = torch.randn_like(x1)
         tau = torch.rand(x1.shape[0], device=x1.device)
         xt = (1 - tau.view(-1, 1, 1)) * x0 + tau.view(-1, 1, 1) * x1
-        return F.mse_loss(self.net(xt, tau * self.n_train, self.norm(obs)), x1 - x0)
+        return F.mse_loss(self.net(xt, tau * self.n_train, self.norm_obs(obs)), x1 - x0)
 
     def schedule(self, steps, spacing=None):
         """等间隔 Euler 步：[(τ_0, τ_1), (τ_1, τ_2), …]，长度 = 网络调用次数。"""
@@ -215,7 +226,7 @@ class FlowPolicy(DiffusionPolicy):
 
     @torch.no_grad()
     def denoise(self, x, obs, sched, frames=None):
-        c = self.norm(obs)
+        c = self.norm_obs(obs)
         for a, b in sched:
             v = self.net(x, torch.full((x.shape[0],), a * self.n_train, device=x.device), c)
             if frames is not None:                           # 当前对终点的一步预测，对应 DDIM 的 x0
@@ -233,12 +244,16 @@ POLICIES = {"ddim": DiffusionPolicy, "flow": FlowPolicy}
 
 # ----------------------------------------------------------------------------- 训练
 
-def train_dp(demos, args, dev):
+def train_dp(demos, args, dev, cond=None):
+    """cond（可选）：(N, Cd) 每条示范的条件向量，拼在位置后面作为观测。"""
     torch.manual_seed(args.seed)
     D = torch.from_numpy(demos).to(dev)
+    C = None if cond is None else torch.as_tensor(cond, dtype=torch.float32, device=dev)
     flat = D.reshape(-1, 2)
     policy = POLICIES[args.method](flat.min(0).values, flat.max(0).values, dims=args.dims, k=args.kernel,
-                             t_dim=args.t_dim, groups=args.groups).to(dev)
+                             t_dim=args.t_dim, groups=args.groups,
+                             cond_lo=None if C is None else C.min(0).values,
+                             cond_hi=None if C is None else C.max(0).values).to(dev)
     ema = copy.deepcopy(policy).requires_grad_(False)
     opt = torch.optim.AdamW(policy.parameters(), lr=args.lr, weight_decay=1e-6)
     warm = min(args.lr_warmup, args.iters // 10)
@@ -250,6 +265,8 @@ def train_dp(demos, args, dev):
         d = torch.randint(0, N, (B,), device=dev)
         t = torch.randint(0, A.DEMO_LEN, (B,), device=dev)
         obs = D[d, t] + args.obs_noise * torch.randn(B, 2, device=dev)
+        if C is not None:
+            obs = torch.cat([obs, C[d]], 1)
         loss = policy.loss(obs, A.chunk_targets(D, d, t))
         opt.zero_grad()
         loss.backward()
@@ -320,9 +337,11 @@ class NCAPlanner:
 # ----------------------------------------------------------------------------- 评估
 
 @torch.no_grad()
-def rollout(planner, episodes, max_steps, dev, seed, extra_hit=None):
+def rollout(planner, episodes, max_steps, dev, seed, extra_hit=None, rects=None, see=True):
     """闭环执行，指标和 action_nca.run_episodes 完全相同；网络调用次数按规划器统计。
-    extra_hit(a, b) 可选：返回每条线段 a→b 是否撞上额外的障碍（novel_obstacle.py 用），形状 (E,)。"""
+    extra_hit(a, b) 可选：返回每条线段 a→b 是否撞上额外的障碍（novel_obstacle.py 用），形状 (E,)。
+    rects 可选：(E, 4) 每个回合各自的矩形障碍（中心 x、y，半宽，半高），代替固定的中央障碍（random_obstacle.py 用）；
+    see=True 时把它拼在位置后面作为观测（策略看得见障碍），False 时只给位置。"""
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
     E = episodes
@@ -335,16 +354,18 @@ def rollout(planner, episodes, max_steps, dev, seed, extra_hit=None):
     n_plans, plan_time = 0, 0.0
     for _ in range(math.ceil(max_steps / T_A)):
         t0 = time.perf_counter()
-        plan = planner.plan(torch.from_numpy(pos).to(dev)).cpu().numpy()
+        obs = torch.from_numpy(pos if rects is None or not see else np.concatenate([pos, rects], 1)).to(dev)
+        plan = planner.plan(obs).cpu().numpy()
         plan_time += time.perf_counter() - t0
         n_plans += 1
         intent = plan[:, -1, 0] - pos[:, 0]
-        for e in np.flatnonzero(alive & (pos[:, 1] < -0.4)):
+        before = pos[:, 1] < (-0.4 if rects is None else rects[:, 1] - rects[:, 3] - 0.1)   # 还没走到障碍跟前
+        for e in np.flatnonzero(alive & before):
             if abs(intent[e]) > 0.03:
                 intents[e].append(np.sign(intent[e]))
         for k in range(T_A):
             new = np.where(alive[:, None], plan[:, k], pos).astype(np.float32)
-            hit = alive & A.seg_hits_box(pos, new)
+            hit = alive & (A.seg_hits_box(pos, new) if rects is None else A.seg_hits_rects(pos, new, rects))
             if extra_hit is not None:
                 hit |= alive & extra_hit(pos, new)
             status[hit] = 2
@@ -363,9 +384,10 @@ def rollout(planner, episodes, max_steps, dev, seed, extra_hit=None):
     rough, kink = [], []
     for e in range(E):
         p = paths[e, :length[e] + 1]
-        m = np.abs(p[:, 1]) < A.BOX_HH
+        cx, cy, hh = (0.0, 0.0, A.BOX_HH) if rects is None else (rects[e, 0], rects[e, 1], rects[e, 3])
+        m = np.abs(p[:, 1] - cy) < hh
         if m.any():
-            side[e] = np.sign(p[m, 0].mean())
+            side[e] = np.sign(p[m, 0].mean() - cx)
         if status[e] == 1 and len(p) > 2:
             dd = np.linalg.norm(p[2:] - 2 * p[1:-1] + p[:-2], axis=1)
             rough.append(dd.mean())

@@ -25,6 +25,7 @@
 - `viz_regrow.py`：画第 14 节的图（再生 / 热启动 + interleave 的路径、最大拐折分布、逐种子成功率和拐折增量）。
 - `results/push_training/`：推动训练后 NCA 的指标和新障碍评估（NOTES.md 第 15 节）。
 - `viz_best.py`：画第 16 节最好的四种组合（路径、逐种子成功率和最大拐折、big 场景里只推法向的作用）。
+- `random_obstacle.py`：障碍随机化、策略看见障碍（观测 = 位置 + 4 个障碍参数）；NCA / DP × 看见 / 看不见，in / ood 两组评估障碍。结果在 `results/random_obstacle/`（NOTES.md 第 17 节）。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
@@ -69,5 +70,5 @@ macOS 上 PyTorch 的 NNPACK 一维卷积很慢，`diffusion_baseline.py` 里已
 
 1. ~~Diffusion Policy 基线~~：已完成（`diffusion_baseline.py`，结果见 NOTES.md 第 9 节）。DP 在成功率和算力上都不输 NCA，NCA 只在计划翻转（模态一致性）上明显更好。
 2. ~~多种子~~：已完成（`multi_seed.py`，结果见 NOTES.md 第 11 节）。第 9 节的结论在 5 个种子上都成立；流匹配还没有做多种子。
-3. 随机化障碍和目标的位置，检验泛化。
+3. ~~随机化障碍、让策略看见障碍~~：已完成（`random_obstacle.py`，NOTES.md 第 17 节）。目标位置还没有随机化。
 4. 迁移到带图像观测的 Push-T。

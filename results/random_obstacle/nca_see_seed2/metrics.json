@@ -1,0 +1,76 @@
+{
+ "train_minutes": 28.222713247934976,
+ "n_demos": 1000,
+ "in/cold_fresh": {
+  "success": 0.986,
+  "collision": 0.014,
+  "timeout": 0.0,
+  "left": 264,
+  "right": 229,
+  "plan_flips": 1.446,
+  "roughness_x100": 1.6403672695159912,
+  "max_kink_x100": 5.523306369781494,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 210.46362154615613
+ },
+ "in/cold_fixed": {
+  "success": 0.992,
+  "collision": 0.008,
+  "timeout": 0.0,
+  "left": 269,
+  "right": 227,
+  "plan_flips": 0.408,
+  "roughness_x100": 1.6427404880523682,
+  "max_kink_x100": 5.374270915985107,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 213.348421948747
+ },
+ "in/warm": {
+  "success": 0.98,
+  "collision": 0.02,
+  "timeout": 0.0,
+  "left": 275,
+  "right": 215,
+  "plan_flips": 0.416,
+  "roughness_x100": 2.188331365585327,
+  "max_kink_x100": 6.356516361236572,
+  "calls_per_plan": 11.692307692307692,
+  "ms_per_plan": 72.99501327081369
+ },
+ "ood/cold_fresh": {
+  "success": 0.902,
+  "collision": 0.098,
+  "timeout": 0.0,
+  "left": 250,
+  "right": 201,
+  "plan_flips": 1.08,
+  "roughness_x100": 1.8623158931732178,
+  "max_kink_x100": 6.203521251678467,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 186.67818912161658
+ },
+ "ood/cold_fixed": {
+  "success": 0.936,
+  "collision": 0.062,
+  "timeout": 0.002,
+  "left": 278,
+  "right": 190,
+  "plan_flips": 0.12,
+  "roughness_x100": 1.8618518114089966,
+  "max_kink_x100": 6.1981000900268555,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 229.94534614392452
+ },
+ "ood/warm": {
+  "success": 0.916,
+  "collision": 0.084,
+  "timeout": 0.0,
+  "left": 249,
+  "right": 209,
+  "plan_flips": 0.072,
+  "roughness_x100": 2.488771915435791,
+  "max_kink_x100": 7.252083778381348,
+  "calls_per_plan": 11.692307692307692,
+  "ms_per_plan": 75.90111307441614
+ }
+}

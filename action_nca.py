@@ -78,12 +78,21 @@ def seg_hits_box(a, b, n=12):
     return ((np.abs(p[..., 0]) < BOX_HW) & (np.abs(p[..., 1]) < BOX_HH)).any(1)
 
 
+def seg_hits_rects(a, b, rects, n=12):
+    """每个回合各自的矩形障碍。rects: (E, 4) = 中心 x、y，半宽，半高。"""
+    ts = np.linspace(0.0, 1.0, n)[None, :, None]
+    p = a[:, None] + ts * (b - a)[:, None]
+    r = rects[:, None]
+    return ((np.abs(p[..., 0] - r[..., 0]) < r[..., 2]) & (np.abs(p[..., 1] - r[..., 1]) < r[..., 3])).any(1)
+
+
 # ----------------------------------------------------------------------------- 模型
 
 class ActionNCA(nn.Module):
     """一维动作 NCA。状态 s 的形状是 (B, C, T_P)，C = 2 个动作通道 + hidden 个隐藏通道。"""
 
-    def __init__(self, hidden=22, z_dim=4, emb=16, width=64, fire_rate=0.5):
+    def __init__(self, hidden=22, z_dim=4, emb=16, width=64, fire_rate=0.5, obs_dim=2):
+        """obs_dim > 2 时观测 = 当前位置（前 2 维）+ 条件向量（例如障碍参数，random_obstacle.py 用）。"""
         super().__init__()
         self.C, self.z_dim, self.fire_rate = 2 + hidden, z_dim, fire_rate
         k = torch.tensor([[0.0, 0.0, 1.0, 0.0, 0.0],     # 恒等：自身状态
@@ -93,7 +102,7 @@ class ActionNCA(nn.Module):
                           [1.0, 0.0, -2.0, 0.0, 1.0]])   # 二阶差分，半径 2
         self.register_buffer("kernel", k.repeat(self.C, 1).unsqueeze(1))          # (5C, 1, 5)
         self.register_buffer("pos", ((torch.arange(T_P) + 1.0) / T_P).view(1, 1, T_P))
-        self.obs_net = nn.Sequential(nn.Linear(2, emb), nn.ReLU(), nn.Linear(emb, emb))
+        self.obs_net = nn.Sequential(nn.Linear(obs_dim, emb), nn.ReLU(), nn.Linear(emb, emb))
         self.update = nn.Sequential(
             nn.Conv1d(5 * self.C + 1 + emb, width, 1), nn.ReLU(),
             nn.Conv1d(width, self.C, 1, bias=False))
@@ -102,7 +111,7 @@ class ActionNCA(nn.Module):
     def seed(self, obs, z):
         """种子细胞 = 现在：动作通道写当前位置，隐藏通道写 z 和一个标记位。"""
         s = obs.new_zeros(obs.shape[0], self.C, 1)
-        s[:, :2, 0] = obs
+        s[:, :2, 0] = obs[:, :2]
         s[:, 2:2 + self.z_dim, 0] = z
         s[:, 2 + self.z_dim, 0] = 1.0
         return s
@@ -110,7 +119,7 @@ class ActionNCA(nn.Module):
     def blank(self, obs):
         """冷启动：所有细胞先停在当前位置，隐藏通道全为 0。"""
         s = obs.new_zeros(obs.shape[0], self.C, T_P)
-        s[:, :2, :] = obs[:, :, None]
+        s[:, :2, :] = obs[:, :2, None]
         return s
 
     def step(self, s, seed, emb):
@@ -177,7 +186,7 @@ def push(s, obs, circles, eta, margin):
     """沿 −η∇C 推细胞带的动作通道。梯度当作外部输入（不对它求导）。"""
     with torch.enable_grad():
         a = plan_of(s).detach().requires_grad_(True)
-        g, = torch.autograd.grad(plan_cost(a, obs, circles, margin).sum(), a)
+        g, = torch.autograd.grad(plan_cost(a, obs[:, :2], circles, margin).sum(), a)
     return torch.cat([s[:, :2] - eta * g.transpose(1, 2), s[:, 2:]], 1)
 
 
@@ -218,9 +227,11 @@ def deform_targets(tgt, obs, circles, margin, iters=80):
 
 # ----------------------------------------------------------------------------- 训练
 
-def train(kind, demos, args, dev):
+def train(kind, demos, args, dev, cond=None):
+    """cond（可选）：(N, Cd) 每条示范的条件向量（例如障碍参数），拼在位置后面作为观测。"""
     torch.manual_seed(args.seed)
-    model = ActionNCA(z_dim=args.z_dim).to(dev)
+    C = None if cond is None else torch.as_tensor(cond, dtype=torch.float32, device=dev)
+    model = ActionNCA(z_dim=args.z_dim, obs_dim=2 if C is None else 2 + C.shape[1]).to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, args.iters, eta_min=args.lr * 0.05)
     K = args.k if kind == "latent" else 1
@@ -237,20 +248,25 @@ def train(kind, demos, args, dev):
     lt = torch.arange(DEMO_LEN, device=dev).repeat(N)
     lib_obs = D[ld, lt]
     lib_rel = (chunk_targets(D, ld, lt) - lib_obs[:, None]).reshape(N * DEMO_LEN, -1)
+    if C is not None:                               # 有条件时，“附近状态”也要求条件相近
+        lib_obs = torch.cat([lib_obs, C[ld]], 1)
     t0 = time.time()
     for it in range(1, args.iters + 1):
         # 冷启动：从“原地不动”的计划长出整段动作
         d = torch.randint(0, N, (B,), device=dev)
         t = torch.randint(0, DEMO_LEN, (B,), device=dev)
         obs = D[d, t] + args.obs_noise * torch.randn(B, 2, device=dev)
+        if C is not None:
+            obs = torch.cat([obs, C[d]], 1)
+        pos = obs[:, :2]
         tgt = chunk_targets(D, d, t)
         steps = int(torch.randint(args.cold_min, args.cold_max + 1, ()).item())
         # 推动训练（可选）：一部分样本在路径附近放一个圆，生长时边长边推，目标换成绕开圆的平滑变形示范。
         # NCA 看不到圆，只感受到推动；要学的是“顺着推动绕开”，而不是把计划拉回原示范。
         circles, has = None, torch.zeros(B, dtype=torch.bool, device=dev)
         if args.push_frac > 0:
-            circles, has = sample_circles(tgt, obs, args.push_frac, args.push_r_lo, args.push_r_hi)
-            tgt = deform_targets(tgt, obs, circles, args.push_target_margin)
+            circles, has = sample_circles(tgt, pos, args.push_frac, args.push_r_lo, args.push_r_hi)
+            tgt = deform_targets(tgt, pos, circles, args.push_target_margin)
             eta = math.exp(math.log(args.push_eta_lo) + torch.rand(()).item() * math.log(args.push_eta_hi / args.push_eta_lo))
 
         def cold_grow(o, zz, cc):
@@ -277,7 +293,7 @@ def train(kind, demos, args, dev):
             M = args.prec_samples
             pobs = obs.repeat_interleave(M, 0)
             ps = model.grow(model.blank(pobs), pobs, torch.randn(B * M, Zd, device=dev), steps)
-            rel = (plan_of(ps) - pobs[:, None]).reshape(B * M, -1)              # 相对当前位置的计划
+            rel = (plan_of(ps) - pobs[:, None, :2]).reshape(B * M, -1)              # 相对当前位置的计划
             near = torch.cdist(obs, lib_obs) < args.prec_radius                 # (B, L)
             near[torch.arange(B, device=dev), d * DEMO_LEN + t] = True          # 至少包含自己那条示范
             err = torch.cdist(rel, lib_rel) ** 2                                # (B*M, L)
@@ -291,6 +307,8 @@ def train(kind, demos, args, dev):
             pi = live[torch.randperm(live.numel(), device=dev)[:B]]
             pd, pt = pool_d[pi], pool_t[pi] + T_A
             wobs = D[pd, pt] + args.obs_noise * torch.randn(B, 2, device=dev)
+            if C is not None:
+                wobs = torch.cat([wobs, C[pd]], 1)
             wsteps = int(torch.randint(args.warm_min, args.warm_max + 1, ()).item())
             ws = model.grow(shift(pool_s[pi]), wobs, pool_z[pi], wsteps)
             loss_w = ((plan_of(ws) - chunk_targets(D, pd, pt)) ** 2).sum((1, 2)).mean()
