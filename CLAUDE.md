@@ -27,6 +27,8 @@
 - `viz_best.py`：画第 16 节最好的四种组合（路径、逐种子成功率和最大拐折、big 场景里只推法向的作用）。
 - `random_obstacle.py`：障碍随机化、策略看见障碍（观测 = 位置 + 4 个障碍参数）；NCA / DP × 看见 / 看不见，in / ood 两组评估障碍。结果在 `results/random_obstacle/`（NOTES.md 第 17 节）。
 - `viz_random.py`：画第 17 节的图（随机障碍下的路径、逐种子成功率 / 拐折 / 计划翻转、看见与看不见的对比）；要在服务器上运行。
+- `pusht.py`：Push-T（状态版，gym_pusht + DP 原始数据集，数据放 `data/pusht/`，已加入 .gitignore）上的 NCA、DP、小 DP；训练在 GPU、评估在 CPU，`--all` 跑种子 0–2 并汇总。结果在 `results/pusht/`（NOTES.md 第 18 节）。
+- `viz_pusht.py`：画第 18 节的图（闭环执行、动作随时间、抖动在块内的位置、逐种子指标）；要在服务器上运行。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
@@ -72,4 +74,4 @@ macOS 上 PyTorch 的 NNPACK 一维卷积很慢，`diffusion_baseline.py` 里已
 1. ~~Diffusion Policy 基线~~：已完成（`diffusion_baseline.py`，结果见 NOTES.md 第 9 节）。DP 在成功率和算力上都不输 NCA，NCA 只在计划翻转（模态一致性）上明显更好。
 2. ~~多种子~~：已完成（`multi_seed.py`，结果见 NOTES.md 第 11 节）。第 9 节的结论在 5 个种子上都成立；流匹配还没有做多种子。
 3. ~~随机化障碍、让策略看见障碍~~：已完成（`random_obstacle.py`，NOTES.md 第 17 节）。目标位置还没有随机化。
-4. 迁移到带图像观测的 Push-T。
+4. Push-T：状态版已完成（`pusht.py`，NOTES.md 第 18 节）。NCA 冷启动的成功率和 DP 打平，但动作更抖、得分更低，再生只有 33%。玩具任务上的平滑和再生优势都没有迁移过来。下一步先修这两点（再生步数、平滑损失、感知范围），再考虑图像观测。

@@ -1,0 +1,25 @@
+[nca] it      1  cold 2.0193  warm 0.0000  prec 1.9034  1s
+[nca] it   1000  cold 0.2081  warm 0.3479  prec 0.3040  394s
+[nca] it   2000  cold 0.1384  warm 0.2737  prec 0.1814  755s
+[nca] it   3000  cold 0.1099  warm 0.1564  prec 0.1482  1005s
+[nca] it   4000  cold 0.1093  warm 0.2167  prec 0.1197  1220s
+[nca] it   5000  cold 0.0861  warm 0.2012  prec 0.0856  1443s
+[nca] it   6000  cold 0.0590  warm 0.1360  prec 0.0677  1665s
+[nca] it   7000  cold 0.0593  warm 0.1497  prec 0.0533  1886s
+[nca] it   8000  cold 0.0608  warm 0.1115  prec 0.0703  2105s
+[nca] it   9000  cold 0.0484  warm 0.1426  prec 0.0530  2324s
+[nca] it  10000  cold 0.0547  warm 0.0792  prec 0.0534  2543s
+[nca] it  11000  cold 0.0427  warm 0.0768  prec 0.0439  2762s
+[nca] it  12000  cold 0.0373  warm 0.1365  prec 0.0375  2979s
+[nca] it  13000  cold 0.0369  warm 0.0859  prec 0.0351  3201s
+[nca] it  14000  cold 0.0306  warm 0.1125  prec 0.0322  3423s
+[nca] it  15000  cold 0.0355  warm 0.0723  prec 0.0282  3635s
+[nca] it  16000  cold 0.0305  warm 0.0788  prec 0.0292  3857s
+[nca] it  17000  cold 0.0367  warm 0.0552  prec 0.0345  4077s
+[nca] it  18000  cold 0.0351  warm 0.0723  prec 0.0282  4300s
+[nca] it  19000  cold 0.0277  warm 0.1023  prec 0.0247  4519s
+[nca] it  20000  cold 0.0281  warm 0.0597  prec 0.0231  4741s
+trained in 79.1 min, 120192 params
+fresh  score 0.921  success 0.600  action_rough 6.195  agent_rough 2.328  chunk_jump 8.229  calls_per_plan 32.000  ms_per_plan 249.360  steps 231.240
+fixed  score 0.895  success 0.530  action_rough 6.183  agent_rough 2.311  chunk_jump 8.227  calls_per_plan 32.000  ms_per_plan 242.293  steps 229.280
+warm   score 0.937  success 0.220  action_rough 7.814  agent_rough 2.266  chunk_jump 7.941  calls_per_plan 10.579  ms_per_plan 90.998  steps 279.520

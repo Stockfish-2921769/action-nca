@@ -1,0 +1,35 @@
+[dp] it      1  loss 1.1184  1s
+[dp] it   1000  loss 0.0366  26s
+[dp] it   2000  loss 0.0308  53s
+[dp] it   3000  loss 0.0277  80s
+[dp] it   4000  loss 0.0263  110s
+[dp] it   5000  loss 0.0248  137s
+[dp] it   6000  loss 0.0231  164s
+[dp] it   7000  loss 0.0212  191s
+[dp] it   8000  loss 0.0202  217s
+[dp] it   9000  loss 0.0196  247s
+[dp] it  10000  loss 0.0179  272s
+[dp] it  11000  loss 0.0171  298s
+[dp] it  12000  loss 0.0164  325s
+[dp] it  13000  loss 0.0150  352s
+[dp] it  14000  loss 0.0142  380s
+[dp] it  15000  loss 0.0131  406s
+[dp] it  16000  loss 0.0131  433s
+[dp] it  17000  loss 0.0115  463s
+[dp] it  18000  loss 0.0110  488s
+[dp] it  19000  loss 0.0107  512s
+[dp] it  20000  loss 0.0098  538s
+[dp] it  21000  loss 0.0098  566s
+[dp] it  22000  loss 0.0084  593s
+[dp] it  23000  loss 0.0077  619s
+[dp] it  24000  loss 0.0075  643s
+[dp] it  25000  loss 0.0067  664s
+[dp] it  26000  loss 0.0065  687s
+[dp] it  27000  loss 0.0063  712s
+[dp] it  28000  loss 0.0060  734s
+[dp] it  29000  loss 0.0057  755s
+[dp] it  30000  loss 0.0058  776s
+trained in 13.0 min, 4131202 params
+fresh  score 0.975  success 0.630  action_rough 3.866  agent_rough 2.078  chunk_jump 6.707  calls_per_plan 10.000  ms_per_plan 702.333  steps 221.070
+fixed  score 0.967  success 0.620  action_rough 4.045  agent_rough 2.134  chunk_jump 7.044  calls_per_plan 10.000  ms_per_plan 773.320  steps 226.160
+warm   score 0.941  success 0.500  action_rough 4.139  agent_rough 2.024  chunk_jump 7.290  calls_per_plan 3.184  ms_per_plan 248.089  steps 237.270

@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 dp_out/
 runs/
+data/
