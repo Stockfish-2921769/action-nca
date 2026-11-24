@@ -33,12 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SETTINGS = [("每次新 z", "cold_fresh"), ("z 固定", "cold_fixed"), ("再生", "warm")]
 
 
-def box_sdf(p):
-    """到以原点为中心的矩形障碍的有符号距离（外正内负）。p: (..., 2)。"""
-    q = p.abs() - p.new_tensor([A.BOX_HW, A.BOX_HH])
-    outside = torch.sqrt((q.clamp(min=0.0) ** 2).sum(-1) + 1e-12)
-    inside = q.max(-1).values.clamp(max=0.0)
-    return outside + inside
+box_sdf = A.box_sdf   # 到矩形障碍的有符号距离（外正内负）
 
 
 def obstacle_cost(plan, obs, margin, n=4):

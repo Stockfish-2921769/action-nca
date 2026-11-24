@@ -23,6 +23,7 @@
 - `guidance.py`：推理时可微避障引导（interleave 边长边推、post 长完再推），加载 `runs/precision/` 里的模型评估，汇总复制到 `results/guidance/`。
 - `novel_obstacle.py`：测试时新障碍（训练时没见过的圆），NCA 和小 DP 在同样的引导下比较；DP 模型在 `runs/novel/dp_seed<s>/`，汇总复制到 `results/novel_obstacle/`。
 - `viz_regrow.py`：画第 14 节的图（再生 / 热启动 + interleave 的路径、最大拐折分布、逐种子成功率和拐折增量）。
+- `results/push_training/`：推动训练后 NCA 的指标和新障碍评估（NOTES.md 第 15 节）。
 - `multi_seed.py`：多种子实验（种子 0–4 的 NCA、小 DP、大 DP），调度训练和评估、汇总均值和波动、逐种子检验结论；中间结果在 `runs/`（已加入 .gitignore），汇总复制到 `results/multi_seed/`。
 - `README.md`：对外的项目说明（GitHub 仓库首页）。
 - `requirements.txt`
@@ -50,6 +51,8 @@ macOS 上 PyTorch 的 NNPACK 一维卷积很慢，`diffusion_baseline.py` 里已
 - `ActionNCA`：`seed()` 种子细胞（当前位置 + z + 标记位），`blank()` 冷启动时“原地不动”的计划，`step()` 一步更新（固定核感知 → 拼上时间位置和观测编码 → 共享 MLP → 随机一半细胞更新），`grow()` 重复若干步。
 - `shift()`：再生前切掉已执行的细胞、前移、补空白尾巴。
 - `train()`：每一轮 = 冷启动样本（min-of-K 选 z）+ 样本池里的再生样本，两个误差相加。
+  可选：`--prec_weight`（精度损失）、`--push_frac`（推动训练：放圆、边长边推、目标换成绕开圆的变形示范，见 `sample_circles`、`deform_targets`、`grow_pushed`）。
+- `box_sdf`、`plan_cost`、`push`：避障代价和推动，`guidance.py`、`novel_obstacle.py` 共用。
 - `run_episodes()`：闭环评估，`cold_fresh`、`cold_fixed`、`warm` 三种执行方式。
 - `first_plan_offsets()`、`growth_frames()`、`plot()`：诊断和画图。
 

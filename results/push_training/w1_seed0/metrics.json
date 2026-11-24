@@ -1,0 +1,48 @@
+{
+  "deterministic, cold start": {
+    "success": 0.986,
+    "collision": 0.014,
+    "timeout": 0.0,
+    "left": 426,
+    "right": 67,
+    "plan_flips": 0.064,
+    "roughness_x100": 1.9819581508636475,
+    "nca_steps_per_plan": 32.0
+  },
+  "latent z, cold start, new z each plan": {
+    "success": 0.988,
+    "collision": 0.012,
+    "timeout": 0.0,
+    "left": 142,
+    "right": 352,
+    "plan_flips": 1.248,
+    "roughness_x100": 2.0128579139709473,
+    "nca_steps_per_plan": 32.0
+  },
+  "latent z, cold start, same z": {
+    "success": 0.982,
+    "collision": 0.018,
+    "timeout": 0.0,
+    "left": 142,
+    "right": 349,
+    "plan_flips": 0.218,
+    "roughness_x100": 1.9759094715118408,
+    "nca_steps_per_plan": 32.0
+  },
+  "latent z, warm start (regrow)": {
+    "success": 0.936,
+    "collision": 0.064,
+    "timeout": 0.0,
+    "left": 208,
+    "right": 260,
+    "plan_flips": 0.008,
+    "roughness_x100": 2.7183640003204346,
+    "nca_steps_per_plan": 11.571428571428571
+  },
+  "first_plan_at_start": {
+    "left": 0.4865,
+    "right": 0.4455,
+    "undecided": 0.068,
+    "deterministic_offset": -0.018195781856775284
+  }
+}

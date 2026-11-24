@@ -1,0 +1,40 @@
+[det] it     1  cold 3.2032  warm 0.0000  0s
+[det] it   100  cold 1.0617  warm 0.8172  35s
+[det] it   200  cold 0.5979  warm 0.2340  71s
+[det] it   300  cold 0.3232  warm 0.4147  107s
+[det] it   400  cold 0.9514  warm 0.5630  144s
+[det] it   500  cold 0.4602  warm 0.5692  181s
+[det] it   600  cold 0.5993  warm 0.3363  217s
+[det] it   700  cold 0.6940  warm 0.0543  253s
+[det] it   800  cold 0.5808  warm 0.3139  291s
+[det] it   900  cold 0.8503  warm 0.1998  330s
+[det] it  1000  cold 0.2970  warm 0.1776  367s
+[det] it  1100  cold 0.5201  warm 0.4041  404s
+[det] it  1200  cold 0.4929  warm 0.4887  441s
+[det] it  1300  cold 0.4497  warm 0.1522  477s
+[det] it  1400  cold 0.6085  warm 0.3678  513s
+[det] it  1500  cold 1.0142  warm 0.4122  549s
+[latent] it     1  cold 3.2032  warm 0.0000  prec 2.4019  1s
+[latent] it   100  cold 0.5368  warm 0.2329  prec 0.2287  89s
+[latent] it   200  cold 0.4455  warm 0.1133  prec 0.5289  180s
+[latent] it   300  cold 0.1791  warm 0.0672  prec 0.0447  270s
+[latent] it   400  cold 0.1361  warm 0.0361  prec 0.0523  362s
+[latent] it   500  cold 0.2110  warm 0.0581  prec 0.0231  454s
+[latent] it   600  cold 0.0954  warm 0.0334  prec 0.0096  546s
+[latent] it   700  cold 0.0707  warm 0.0377  prec 0.0211  637s
+[latent] it   800  cold 0.1830  warm 0.0326  prec 0.0142  731s
+[latent] it   900  cold 0.0605  warm 0.0460  prec 0.0072  825s
+[latent] it  1000  cold 0.1368  warm 0.0419  prec 0.0073  919s
+[latent] it  1100  cold 0.1011  warm 0.0222  prec 0.0067  1015s
+[latent] it  1200  cold 0.2296  warm 0.0356  prec 0.0343  1113s
+[latent] it  1300  cold 0.0917  warm 0.0256  prec 0.0042  1204s
+[latent] it  1400  cold 0.1479  warm 0.0511  prec 0.0281  1300s
+[latent] it  1500  cold 0.0940  warm 0.0285  prec 0.0164  1392s
+
+deterministic, cold start                success=0.954  collision=0.046  timeout=0  left=438  right=39  plan_flips=0.114  roughness_x100=2.1  nca_steps_per_plan=32
+latent z, cold start, new z each plan    success=0.994  collision=0.006  timeout=0  left=303  right=194  plan_flips=1.21  roughness_x100=1.77  nca_steps_per_plan=32
+latent z, cold start, same z             success=0.996  collision=0.004  timeout=0  left=286  right=212  plan_flips=0.122  roughness_x100=1.7  nca_steps_per_plan=32
+latent z, warm start (regrow)            success=0.88  collision=0.12  timeout=0  left=315  right=125  plan_flips=0.016  roughness_x100=2.33  nca_steps_per_plan=11.7
+
+first plan at start: latent left 58%, right 37%, undecided 5%; deterministic offset -0.040
+saved to runs/push/w1_seed2/

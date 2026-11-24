@@ -9,6 +9,7 @@
 
 场景（每个回合各自采样，评估种子 + 100 决定障碍位置）：
   left：  固定一个圆（中心 (−0.6, 0)，半径 0.1）挡在左绕路线正中；
+  big：   随机一侧的路线正中放一个半径 0.16 的圆（比 --push_frac 训练里的圆都大）；
   random2：左右两条路线上各放一个圆（半径 0.08），中心取在一条随机示范式路线上（再加一点扰动），
           所以无论选哪边都要绕开。
 
@@ -32,7 +33,6 @@ import torch
 
 import action_nca as A
 import diffusion_baseline as DB
-from guidance import box_sdf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 COLD_PUSH, WARM_PUSH = 32, 10
@@ -56,6 +56,11 @@ def make_scene(name, E, rng):
             y = A.START[1] + (A.GOAL[1] - A.START[1]) * u + rng.normal(0.0, 0.03, E)
             out.append(np.stack([x, y, np.full(E, 0.08)], 1))
         return np.stack(out, 1).astype(np.float32)
+    if name == "big":         # 比推动训练里的圆（半径 ≤ 0.12）大：随机一侧放一个半径 0.16 的圆
+        side = np.where(rng.random(E) < 0.5, -1.0, 1.0)
+        y = rng.uniform(-0.1, 0.1, E)
+        x = side * rng.uniform(0.6, 0.7, E)
+        return np.stack([x, y, np.full(E, 0.16)], 1)[:, None].astype(np.float32)
     raise ValueError(name)
 
 
@@ -77,13 +82,8 @@ class Pusher:
     def __init__(self, circles, eta, margin):
         self.c, self.eta, self.margin = torch.from_numpy(circles), eta, margin
 
-    def cost(self, plan, obs, n=4):
-        P = torch.cat([obs[:, None], plan], 1)
-        ts = torch.linspace(0.0, 1.0, n + 1)[:-1].view(1, 1, -1, 1)
-        pts = (P[:, :-1, None] + ts * (P[:, 1:, None] - P[:, :-1, None])).flatten(1, 2)   # (E, N, 2)
-        d = torch.sqrt(((pts[:, :, None] - self.c[:, None, :, :2]) ** 2).sum(-1) + 1e-12) - self.c[:, None, :, 2]
-        sdf = torch.minimum(box_sdf(pts), d.min(-1).values)
-        return (torch.relu(self.margin - sdf) ** 2).sum()
+    def cost(self, plan, obs):
+        return A.plan_cost(plan, obs, self.c, self.margin).sum()
 
     def __call__(self, plan, obs, times=1):
         for _ in range(times):
@@ -173,10 +173,10 @@ def evaluate(job):
     pusher = Pusher(circles, eta, a["margin"])
     if method == "nca":
         m = A.ActionNCA()
-        m.load_state_dict(torch.load(os.path.join(a["nca_models"], f"w1_seed{seed}", "nca_latent.pt"), map_location="cpu"))
+        m.load_state_dict(torch.load(os.path.join(a["nca_models"], f"{a['nca_tag']}_seed{seed}", "nca_latent.pt"), map_location="cpu"))
         planner = DB.NCAPlanner(GuidedNCA(m.eval(), pusher, guide), "latent", setting)
     else:
-        planner = GuidedDP(load_dp(os.path.join(a["runs"], f"dp_seed{seed}", "dp_policy.pt")), setting, pusher, guide)
+        planner = GuidedDP(load_dp(os.path.join(a["dp_models"], f"dp_seed{seed}", "dp_policy.pt")), setting, pusher, guide)
     t0 = time.time()
     r = DB.rollout(planner, a["episodes"], 72, "cpu", seed + 1, extra_hit=circle_hits(circles))[0]
     r["seconds"] = time.time() - t0
@@ -228,10 +228,13 @@ def main():
     ap.add_argument("--margin", type=float, default=0.03)
     ap.add_argument("--episodes", type=int, default=500)
     ap.add_argument("--nca_models", default=os.path.join(HERE, "runs", "precision"))
+    ap.add_argument("--nca_tag", default="w1", help="NCA 模型目录名的前缀：<nca_models>/<tag>_seed<s>/")
+    ap.add_argument("--dp_models", default=os.path.join(HERE, "runs", "novel"))
     ap.add_argument("--runs", default=os.path.join(HERE, "runs", "novel"))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 2))
     ap.add_argument("--aggregate_only", action="store_true")
     args = ap.parse_args()
+    os.makedirs(args.runs, exist_ok=True)
     out = os.path.join(args.runs, "results.json")
     if args.aggregate_only:
         rows = json.load(open(out, encoding="utf-8"))

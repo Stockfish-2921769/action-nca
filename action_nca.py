@@ -144,6 +144,68 @@ def plan_of(s):
     return s[:, :2, :].transpose(1, 2)   # (B, T_P, 2)
 
 
+# ----------------------------------------------------------------------------- 避障代价和推动（guidance.py、novel_obstacle.py 和 --push_frac 训练共用）
+
+def box_sdf(p):
+    """到以原点为中心的矩形障碍的有符号距离（外正内负）。p: (..., 2)。"""
+    q = p.abs() - p.new_tensor([BOX_HW, BOX_HH])
+    return torch.sqrt((q.clamp(min=0.0) ** 2).sum(-1) + 1e-12) + q.max(-1).values.clamp(max=0.0)
+
+
+def plan_cost(plan, obs, circles, margin, n=4):
+    """每条计划的避障代价 Σ relu(margin − sdf)²，取“当前位置 → 各航点”折线上的插值点。
+    plan: (B, T_P, 2)，obs: (B, 2)，circles: (B, K, 3) 圆心和半径（半径 0 的圆放远处即等于没有）。返回 (B,)。"""
+    P = torch.cat([obs[:, None], plan], 1)
+    ts = torch.linspace(0.0, 1.0, n + 1, device=plan.device)[:-1].view(1, 1, -1, 1)
+    pts = (P[:, :-1, None] + ts * (P[:, 1:, None] - P[:, :-1, None])).flatten(1, 2)
+    d = torch.sqrt(((pts[:, :, None] - circles[:, None, :, :2]) ** 2).sum(-1) + 1e-12) - circles[:, None, :, 2]
+    sdf = torch.minimum(box_sdf(pts), d.min(-1).values)
+    return (torch.relu(margin - sdf) ** 2).sum(1)
+
+
+def push(s, obs, circles, eta, margin):
+    """沿 −η∇C 推细胞带的动作通道。梯度当作外部输入（不对它求导）。"""
+    with torch.enable_grad():
+        a = plan_of(s).detach().requires_grad_(True)
+        g, = torch.autograd.grad(plan_cost(a, obs, circles, margin).sum(), a)
+    return torch.cat([s[:, :2] - eta * g.transpose(1, 2), s[:, 2:]], 1)
+
+
+def grow_pushed(model, s, obs, z, steps, circles, eta, margin):
+    """边长边推：NCA 每长一步推一次（interleave）。"""
+    seed, emb = model.seed(obs, z), model.obs_net(obs)
+    for _ in range(steps):
+        s = push(model.step(s, seed, emb), obs, circles, eta, margin)
+    return s
+
+
+def sample_circles(tgt, obs, frac, r_lo, r_hi):
+    """推动训练用的圆：一部分样本在目标动作块的随机航点附近放一个圆，其余样本放一个“空圆”（远处、半径 0）。"""
+    B, dev = tgt.shape[0], tgt.device
+    j = torch.randint(0, T_P, (B,), device=dev)
+    c = tgt[torch.arange(B, device=dev), j] + 0.06 * torch.randn(B, 2, device=dev)
+    r = r_lo + (r_hi - r_lo) * torch.rand(B, device=dev)
+    has = (torch.rand(B, device=dev) < frac) & ((c - obs).norm(dim=1) > r + 0.05)   # 当前位置不能在圆里或贴着圆
+    circles = torch.where(has[:, None], torch.cat([c, r[:, None]], 1), c.new_tensor([10.0, 10.0, 0.0]))
+    return circles[:, None], has
+
+
+def deform_targets(tgt, obs, circles, margin, iters=80):
+    """把示范动作块平滑地变形到绕开圆：最小化 避障代价 + 变形的二阶差分 + 离原示范的距离。
+    没有圆的样本代价为 0，结果就是原示范。"""
+    with torch.enable_grad():
+        delta = torch.zeros_like(tgt, requires_grad=True)
+        opt = torch.optim.Adam([delta], lr=0.02)
+        for _ in range(iters):
+            dd = torch.cat([delta.new_zeros(delta.shape[0], 1, 2), delta], 1)        # 当前位置处不变形
+            rough = ((dd[:, 2:] - 2 * dd[:, 1:-1] + dd[:, :-2]) ** 2).sum((1, 2))
+            loss = (1000 * plan_cost(tgt + delta, obs, circles, margin) + 30 * rough + (delta ** 2).sum((1, 2))).sum()
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+    return (tgt + delta).detach()
+
+
 # ----------------------------------------------------------------------------- 训练
 
 def train(kind, demos, args, dev):
@@ -173,16 +235,29 @@ def train(kind, demos, args, dev):
         obs = D[d, t] + args.obs_noise * torch.randn(B, 2, device=dev)
         tgt = chunk_targets(D, d, t)
         steps = int(torch.randint(args.cold_min, args.cold_max + 1, ()).item())
+        # 推动训练（可选）：一部分样本在路径附近放一个圆，生长时边长边推，目标换成绕开圆的平滑变形示范。
+        # NCA 看不到圆，只感受到推动；要学的是“顺着推动绕开”，而不是把计划拉回原示范。
+        circles, has = None, torch.zeros(B, dtype=torch.bool, device=dev)
+        if args.push_frac > 0:
+            circles, has = sample_circles(tgt, obs, args.push_frac, args.push_r_lo, args.push_r_hi)
+            tgt = deform_targets(tgt, obs, circles, args.push_target_margin)
+            eta = math.exp(math.log(args.push_eta_lo) + torch.rand(()).item() * math.log(args.push_eta_hi / args.push_eta_lo))
+
+        def cold_grow(o, zz, cc):
+            if circles is None:
+                return model.grow(model.blank(o), o, zz, steps)
+            return grow_pushed(model, model.blank(o), o, zz, steps, cc, eta, args.push_margin)
+
         if K > 1:
             with torch.no_grad():   # min-of-K：先试 K 个 z，挑出离示范最近的那个
                 zk = torch.randn(B * K, Zd, device=dev)
                 ok = obs.repeat_interleave(K, 0)
-                sk = model.grow(model.blank(ok), ok, zk, steps)
+                sk = cold_grow(ok, zk, None if circles is None else circles.repeat_interleave(K, 0))
                 err = ((plan_of(sk) - tgt.repeat_interleave(K, 0)) ** 2).sum((1, 2)).view(B, K)
                 z = zk.view(B, K, Zd)[torch.arange(B, device=dev), err.argmin(1)]
         else:
             z = torch.zeros(B, Zd, device=dev)
-        s = model.grow(model.blank(obs), obs, z, steps)
+        s = cold_grow(obs, z, circles)
         loss_c = ((plan_of(s) - tgt) ** 2).sum((1, 2)).mean()
 
         # 精度损失（可选）：min-of-K 只训练最好的那个 z，其余 z 长成什么都不受罚。
@@ -219,7 +294,7 @@ def train(kind, demos, args, dev):
         sched.step()
 
         # 冷启动的结果放进样本池，优先占用已经走完的位置
-        keep = torch.nonzero(t <= last_t).squeeze(1)
+        keep = torch.nonzero((t <= last_t) & ~has).squeeze(1)      # 被推过的计划不进样本池（再生训练的目标是原示范）
         if keep.numel():
             free = torch.nonzero(~pool_ok).squeeze(1)
             free = free[torch.randperm(free.numel(), device=dev)]
@@ -387,6 +462,14 @@ def main():
                     help="精度损失的权重（0 = 关闭，即原来的纯 min-of-K）")
     ap.add_argument("--prec_samples", type=int, default=2, help="精度损失每个观测另采几个随机 z")
     ap.add_argument("--prec_radius", type=float, default=0.04, help="精度损失里“附近状态”的半径")
+    ap.add_argument("--push_frac", type=float, default=0.0,
+                    help="推动训练：冷启动样本里放圆、边长边推的比例（0 = 关闭）")
+    ap.add_argument("--push_r_lo", type=float, default=0.05, help="推动训练里圆的最小半径")
+    ap.add_argument("--push_r_hi", type=float, default=0.12, help="推动训练里圆的最大半径")
+    ap.add_argument("--push_eta_lo", type=float, default=0.1, help="推动步长 η 的下限（每轮按对数均匀采样）")
+    ap.add_argument("--push_eta_hi", type=float, default=1.0, help="推动步长 η 的上限")
+    ap.add_argument("--push_margin", type=float, default=0.03, help="推动用的避障代价 margin（与评估时相同）")
+    ap.add_argument("--push_target_margin", type=float, default=0.06, help="变形目标离障碍的 margin（留出余量）")
     ap.add_argument("--n_demos", type=int, default=200)
     ap.add_argument("--episodes", type=int, default=200)
     ap.add_argument("--max_steps", type=int, default=72)
