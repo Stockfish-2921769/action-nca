@@ -320,8 +320,9 @@ class NCAPlanner:
 # ----------------------------------------------------------------------------- 评估
 
 @torch.no_grad()
-def rollout(planner, episodes, max_steps, dev, seed):
-    """闭环执行，指标和 action_nca.run_episodes 完全相同；网络调用次数按规划器统计。"""
+def rollout(planner, episodes, max_steps, dev, seed, extra_hit=None):
+    """闭环执行，指标和 action_nca.run_episodes 完全相同；网络调用次数按规划器统计。
+    extra_hit(a, b) 可选：返回每条线段 a→b 是否撞上额外的障碍（novel_obstacle.py 用），形状 (E,)。"""
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
     E = episodes
@@ -344,6 +345,8 @@ def rollout(planner, episodes, max_steps, dev, seed):
         for k in range(T_A):
             new = np.where(alive[:, None], plan[:, k], pos).astype(np.float32)
             hit = alive & A.seg_hits_box(pos, new)
+            if extra_hit is not None:
+                hit |= alive & extra_hit(pos, new)
             status[hit] = 2
             length += alive
             alive &= ~hit
