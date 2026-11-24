@@ -160,6 +160,11 @@ def train(kind, demos, args, dev):
     pool_d = torch.zeros(P, dtype=torch.long, device=dev)
     pool_t = torch.zeros(P, dtype=torch.long, device=dev)
     pool_ok = torch.zeros(P, dtype=torch.bool, device=dev)
+    # 精度损失用的示范库：每个 (示范, 时刻) 的观测和相对动作块，下标 = d * DEMO_LEN + t
+    ld = torch.arange(N, device=dev).repeat_interleave(DEMO_LEN)
+    lt = torch.arange(DEMO_LEN, device=dev).repeat(N)
+    lib_obs = D[ld, lt]
+    lib_rel = (chunk_targets(D, ld, lt) - lib_obs[:, None]).reshape(N * DEMO_LEN, -1)
     t0 = time.time()
     for it in range(1, args.iters + 1):
         # 冷启动：从“原地不动”的计划长出整段动作
@@ -180,6 +185,20 @@ def train(kind, demos, args, dev):
         s = model.grow(model.blank(obs), obs, z, steps)
         loss_c = ((plan_of(s) - tgt) ** 2).sum((1, 2)).mean()
 
+        # 精度损失（可选）：min-of-K 只训练最好的那个 z，其余 z 长成什么都不受罚。
+        # 这里另采 M 个随机 z，要求它们长出的计划离“附近状态上的某条示范动作块”足够近。
+        loss_p = torch.zeros((), device=dev)
+        if K > 1 and args.prec_weight > 0:
+            M = args.prec_samples
+            pobs = obs.repeat_interleave(M, 0)
+            ps = model.grow(model.blank(pobs), pobs, torch.randn(B * M, Zd, device=dev), steps)
+            rel = (plan_of(ps) - pobs[:, None]).reshape(B * M, -1)              # 相对当前位置的计划
+            near = torch.cdist(obs, lib_obs) < args.prec_radius                 # (B, L)
+            near[torch.arange(B, device=dev), d * DEMO_LEN + t] = True          # 至少包含自己那条示范
+            err = torch.cdist(rel, lib_rel) ** 2                                # (B*M, L)
+            err = err.masked_fill(~near.repeat_interleave(M, 0), float("inf"))
+            loss_p = err.min(1).values.mean()
+
         # 热启动：从样本池取执行到一半的计划，切掉、前移、补尾巴，再长几步
         loss_w = torch.zeros((), device=dev)
         live = torch.nonzero(pool_ok).squeeze(1)
@@ -192,7 +211,7 @@ def train(kind, demos, args, dev):
             loss_w = ((plan_of(ws) - chunk_targets(D, pd, pt)) ** 2).sum((1, 2)).mean()
             pool_s[pi], pool_t[pi], pool_ok[pi] = ws.detach(), pt, pt <= last_t
 
-        loss = loss_c + loss_w
+        loss = loss_c + loss_w + args.prec_weight * loss_p
         opt.zero_grad()
         loss.backward()
         nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -213,7 +232,8 @@ def train(kind, demos, args, dev):
             pool_d[slots], pool_t[slots], pool_ok[slots] = d[keep], t[keep], True
 
         if it == 1 or it % args.log_every == 0:
-            print(f"[{kind}] it {it:5d}  cold {loss_c.item():.4f}  warm {loss_w.item():.4f}"
+            prec = f"  prec {loss_p.item():.4f}" if args.prec_weight > 0 and K > 1 else ""
+            print(f"[{kind}] it {it:5d}  cold {loss_c.item():.4f}  warm {loss_w.item():.4f}{prec}"
                   f"  {time.time() - t0:.0f}s", flush=True)
     return model
 
@@ -363,6 +383,10 @@ def main():
     ap.add_argument("--warm_max", type=int, default=14)
     ap.add_argument("--cold_steps", type=int, default=32, help="评估时冷启动的 NCA 步数")
     ap.add_argument("--warm_steps", type=int, default=10, help="评估时再生续长的 NCA 步数")
+    ap.add_argument("--prec_weight", type=float, default=0.0,
+                    help="精度损失的权重（0 = 关闭，即原来的纯 min-of-K）")
+    ap.add_argument("--prec_samples", type=int, default=2, help="精度损失每个观测另采几个随机 z")
+    ap.add_argument("--prec_radius", type=float, default=0.04, help="精度损失里“附近状态”的半径")
     ap.add_argument("--n_demos", type=int, default=200)
     ap.add_argument("--episodes", type=int, default=200)
     ap.add_argument("--max_steps", type=int, default=72)
