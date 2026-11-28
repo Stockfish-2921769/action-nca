@@ -7,7 +7,7 @@
 右上：卡住的状态上，计划第 k 步离当前推杆位置的距离：NCA（默认冷启动 32 步）、同一批状态上的 DP 和小 DP；
       灰色虚线是 NCA 在正常状态上的计划。
 左下：吸引子：卡住的状态上，NCA 从“停在原地”（默认冷启动）或从 DP 的计划出发，每长一步后计划第 8 步离推杆多远；
-      灰色是正常状态。
+      灰色是正常状态，黑色点线是第十一轮从噪声出发训练（σ = 1）的模型在卡住的状态上从噪声长起（右上和这里的色带不含它们）。
 右下：评估时冷启动的生长步数（不重训；se、se_zemb、se_exec 各 3 个种子）。
 线 = 所有（模型, 种子）的中位数，色带 = 最小到最大。
 
@@ -71,7 +71,10 @@ VARIANTS = [("nca", "基线"), ("sync", "sync"), ("ema", "ema"), ("smooth", "smo
             ("se_persist", "se_persist"), ("se_prand", "se_prand"), ("se_pp", "se_pp"), ("se_jit4", "se_jit4"),
             ("se_jit8", "se_jit8"), ("se_zemb", "se_zemb"), ("se_exec", "se_exec"), ("se_global", "se_global"),
             ("se_nopad", "se_nopad"), ("se_global_dag", "se_global + DAgger"), ("se_global_dart", "se_global + DART"),
-            ("se_global_rescue", "se_global + 按结果挑标签"), ("se_global_rescue2", "se_global + 再收集一轮")]
+            ("se_global_rescue", "se_global + 按结果挑标签"), ("se_global_rescue2", "se_global + 再收集一轮"),
+            ("se_global_ns1", "se_global，从噪声出发 σ = 1"), ("se_global_ns025", "se_global，从噪声出发 σ = 0.25")]
+NOISE_START = ("se_global_ns1", "se_global_ns025")                   # 从噪声出发的变体（第十一轮）：冷启动的起点不同，不和其余的放一起
+is_noise = lambda key: key.split("/")[0] in NOISE_START
 
 
 def load(name):
@@ -110,7 +113,7 @@ def panel_cat(ax, cat, diag, final):
                    alpha=1.0 if len(vals) > 1 or v in COL else 0.55)
         if len(vals) > 1:
             ax.vlines(np.mean(vals), y - 0.32, y + 0.32, color=INK, lw=1.4, zorder=4)
-        if v in big:
+        if v in big and len(big[v]) >= 3:                                  # 只有 1 个种子的 500 回合复评不画 ◇
             ax.scatter([np.mean(big[v])], [y], s=46, marker="D", facecolor="none", edgecolor=INK, lw=1.1, zorder=5)
     for v in ("dp_small", "dp"):
         ax.axvline(np.mean(big.get(v, ref[v])), color=COL[v], lw=1.0, ls=(0, (4, 3)), zorder=0)
@@ -119,7 +122,7 @@ def panel_cat(ax, cat, diag, final):
     ax.set_xlabel("彻底失败率（%）；点 = 种子（100 回合），竖线 = 均值，浅色点 = 只有 1 个种子，◇ = 500 回合 × 3 个种子的均值",
                   fontsize=8)
     ax.grid(axis="x", color=GRID, lw=0.8)
-    nca_big = [np.mean(x) for m, x in big.items() if not m.startswith("dp")]
+    nca_big = [np.mean(x) for m, x in big.items() if not m.startswith("dp") and len(x) >= 3]
     title = (f"彻底失败率：NCA {min(nca_big):.1f}–{max(nca_big):.1f}%，小 DP {np.mean(big['dp_small']):.1f}%，"
              f"DP {np.mean(big['dp']):.1f}%（500 回合）" if nca_big and "dp_small" in big and "dp" in big else
              f"彻底失败率：小 DP {np.mean(ref['dp_small']):.1f}%，DP {np.mean(ref['dp']):.1f}%")
@@ -128,8 +131,8 @@ def panel_cat(ax, cat, diag, final):
 
 def panel_profile(ax, att):
     x = np.arange(1, 17)
-    st = [v["stall"] for v in att.values() if "stall" in v and "prof_nca" in v["stall"]]
-    nm = [v["normal"] for v in att.values() if "normal" in v and "prof_nca" in v["normal"]]
+    st = [v["stall"] for k, v in att.items() if "stall" in v and "prof_nca" in v["stall"] and not is_noise(k)]
+    nm = [v["normal"] for k, v in att.items() if "normal" in v and "prof_nca" in v["normal"] and not is_noise(k)]
     m_nm = band(ax, x, [r["prof_nca"] for r in nm], MUTED, ls=(0, (4, 3)), lw=1.4, alpha=0.0)
     m_nca = band(ax, x, [r["prof_nca"] for r in st], COL["nca"])
     m_dps = band(ax, x, [r["prof_dp_small"] for r in st], COL["dp_small"], alpha=0.0)
@@ -153,24 +156,34 @@ def panel_profile(ax, att):
 
 
 def panel_attract(ax, att):
+    """色带和线 = 只用“停在原地”起点的模型；从噪声出发（σ = 1）的 3 个模型在卡住的状态上单独一条线（它们的默认起点就是噪声）。"""
     x = np.arange(1, 33)
-    st = [v["stall"] for v in att.values() if "stall" in v and "blank_curve" in v["stall"]]
-    nm = [v["normal"] for v in att.values() if "normal" in v and "blank_curve" in v["normal"]]
+    st = [v["stall"] for k, v in att.items() if "stall" in v and "blank_curve" in v["stall"] and not is_noise(k)]
+    nm = [v["normal"] for k, v in att.items() if "normal" in v and "blank_curve" in v["normal"] and not is_noise(k)]
+    ns = [v["stall"] for k, v in att.items() if k.split("/")[0] == "se_global_ns1" and "stall" in v and "blank_curve" in v["stall"]]
     lines = [(nm, "blank_curve", MUTED, "-", "正常状态，从停在原地出发"), (nm, "from_dp_curve", MUTED, (0, (4, 3)), "正常状态，从 DP 计划出发"),
              (st, "blank_curve", COL["nca"], "-", "卡住的状态，从停在原地出发"),
              (st, "from_dp_curve", COL["nca"], (0, (4, 3)), "卡住的状态，从 DP 计划出发")]
+    if ns:
+        lines.append((ns, "blank_curve", INK, (0, (1, 1.5)), f"卡住的状态，从噪声出发（σ = 1 训练的 {len(ns)} 个模型）"))
     for rs, key, col, ls, lab in lines:
         band(ax, x, [r[key] for r in rs], col, ls=ls, label=lab, alpha=0.10 if col == COL["nca"] else 0.0)
     ax.axvline(32, color=INK2, lw=0.8, ls=":", zorder=0)
     ax.text(31.6, 36, "评估时\n长 32 步", fontsize=7, color=INK2, ha="right")
     ax.set_xlim(1, 33)
     ax.set_xticks([1, 8, 16, 24, 32])
-    ax.set_ylim(0, None)
+    if ns:                                                               # 从噪声出发的线开头有几百像素，纵轴截在 100，标出起点
+        ax.set_ylim(0, 100)
+        y0 = np.median([r["blank_curve"][0] for r in ns])
+        ax.annotate(f"从噪声出发：长 1 步后约 {y0:.0f} 像素", (2.2, 98), fontsize=7, color=INK2, va="top")
+    else:
+        ax.set_ylim(0, None)
     ax.set_xlabel("NCA 生长步数")
     ax.set_ylabel("计划第 8 步离推杆（像素，中位数）")
     ax.grid(axis="y", color=GRID, lw=0.8)
-    ax.legend(loc="upper right", fontsize=7.5, frameon=False)
-    ax.set_title("吸引子：卡住的状态上，从 DP 的好计划出发也会被拉回原地", fontsize=9.5, loc="left")
+    ax.legend(loc="upper right", bbox_to_anchor=(1.0, 0.92 if ns else 1.0), fontsize=7.5, frameon=False)   # 让出顶上的起点标注
+    ax.set_title("吸引子：卡住的状态上，从 DP 的好计划或从噪声出发，都会被拉回原地" if ns else
+                 "吸引子：卡住的状态上，从 DP 的好计划出发也会被拉回原地", fontsize=9.5, loc="left")
 
 
 def panel_steps(ax, steps, cat_ref):

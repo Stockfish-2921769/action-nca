@@ -86,7 +86,7 @@ def train_nca(O, Y, NXT, a, dev):
     N, B, K, Zd, P = len(O), a.batch, a.k, a.z_dim, a.pool
     model = A.ActionNCA(hidden=a.nca_hidden, z_dim=Zd, emb=a.nca_emb, width=a.nca_width, fire_rate=a.fire_rate,
                         obs_dim=O.shape[1], z_emb=bool(a.z_emb), global_ch=bool(a.nca_global),
-                        seed_pad=bool(a.seed_pad)).to(dev)
+                        seed_pad=bool(a.seed_pad), noise_start=a.noise_start).to(dev)
     ema = copy.deepcopy(model).requires_grad_(False) if a.nca_ema > 0 else None
     wt = torch.ones(T_P, 1, device=dev)                                # 每个时刻的误差权重：前 T_A 步是真正会执行的
     wt[:T_A] = a.exec_weight
@@ -113,10 +113,13 @@ def train_nca(O, Y, NXT, a, dev):
         with torch.no_grad():                                          # min-of-K
             zk = torch.randn(B * K, Zd, device=dev)
             ok = obs.repeat_interleave(K, 0)
-            sk = model.grow(model.blank(ok), ok, zk, steps)
+            ek = torch.randn(B * K, 2, T_P, device=dev) if a.noise_start > 0 else None   # 从噪声出发：起点也是随机的
+            sk = model.grow(model.blank(ok, ek), ok, zk, steps)
             err = sq(A.plan_of(sk), tgt.repeat_interleave(K, 0)).view(B, K)
-            z = zk.view(B, K, Zd)[torch.arange(B, device=dev), err.argmin(1)]
-        s = model.grow(model.blank(obs), obs, z, steps)
+            pick = err.argmin(1)
+            z = zk.view(B, K, Zd)[torch.arange(B, device=dev), pick]
+            e = ek.view(B, K, 2, T_P)[torch.arange(B, device=dev), pick] if ek is not None else None   # 选中的 z 配原来的噪声
+        s = model.grow(model.blank(obs, e), obs, z, steps)
         loss_c = sq(A.plan_of(s), tgt).mean()
 
         loss_p = torch.zeros((), device=dev)
@@ -230,6 +233,7 @@ class NCAPlan:
     def reset(self, E):
         self.E, self.s, self.calls, self.n = E, None, 0, 0
         self.z = self.zs * torch.randn(E, self.zd)
+        self.eps = torch.randn(E, 2, T_P) if self.m.noise_start > 0 else None   # 从噪声出发时 fixed 也固定起点的噪声
 
     @torch.no_grad()
     def plan(self, obs):
@@ -239,7 +243,7 @@ class NCAPlan:
         else:
             if self.mode == "fresh":
                 self.z = self.zs * torch.randn(self.E, self.zd)
-            self.s = self.m.grow(self.m.blank(obs), obs, self.z, self.cs)
+            self.s = self.m.grow(self.m.blank(obs, self.eps if self.mode == "fixed" else None), obs, self.z, self.cs)
             self.calls += self.cs
         self.n += 1
         return A.plan_of(self.s)
@@ -328,7 +332,7 @@ def make_planner(kind, path, mode, cold_steps=32, warm_steps=10, dp_steps=10, dp
         m = A.ActionNCA(hidden=ck["hidden"], z_dim=ck["z_dim"], emb=ck["emb"], width=ck["width"], obs_dim=ck["obs_dim"],
                         fire_rate=fire_rate if fire_rate is not None else ck.get("fire_rate", 0.5),
                         z_emb=ck.get("z_emb", False), global_ch=ck.get("global_ch", False),
-                        seed_pad=ck.get("seed_pad", True))
+                        seed_pad=ck.get("seed_pad", True), noise_start=ck.get("noise_start", 0.0))
         m.load_state_dict(ck["state"])
         return NCAPlan(m.eval(), mode, ck["z_dim"], cold_steps, warm_steps, warm_refresh, z_scale)
     cd, one = ck["cond_dim"], torch.ones(2)
@@ -369,7 +373,7 @@ def run_job(a):
         path = os.path.join(out, "nca.pt")
         torch.save(dict(state=model.state_dict(), hidden=a.nca_hidden, z_dim=a.z_dim, emb=a.nca_emb, width=a.nca_width,
                         fire_rate=a.fire_rate, z_emb=bool(a.z_emb), global_ch=bool(a.nca_global),
-                        seed_pad=bool(a.seed_pad), obs_dim=O.shape[1]), path)
+                        seed_pad=bool(a.seed_pad), noise_start=a.noise_start, obs_dim=O.shape[1]), path)
     else:
         model = train_dp(O, Y, a, dev).cpu().eval()
         path = os.path.join(out, "dp.pt")
@@ -505,6 +509,8 @@ def main():
     ap.add_argument("--exec_weight", type=float, default=1.0, help="动作块前 T_A 步（会执行的部分）误差的权重")
     ap.add_argument("--nca_global", type=int, default=0, help="1 = 每个细胞的感知加上所有细胞状态的均值")
     ap.add_argument("--seed_pad", type=int, default=1, help="0 = 左边界复制第一个细胞，不用种子细胞（应配合 --z_emb 1）")
+    ap.add_argument("--noise_start", type=float, default=0.0,
+                    help="> 0 时冷启动从噪声出发：动作通道 = 当前位置 + N(0, σ²)（归一化坐标，1 ≈ 256 像素），训练和评估都用")
     ap.add_argument("--warm_refresh", type=int, default=0, help="评估再生时每隔这么多次规划冷启动一次（0 = 从不）")
     ap.add_argument("--z_scale", type=float, default=1.0, help="评估时 NCA 的 z ~ N(0, z_scale²)")
     # DP

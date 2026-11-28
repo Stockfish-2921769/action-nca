@@ -856,5 +856,57 @@
   "catastrophic": 0.026,
   "near": 0.266,
   "episodes": 500
+ },
+ "se_global_ns1/fresh/1": {
+  "score": 0.9156521514281368,
+  "success": 0.51,
+  "action_rough": 4.39801025390625,
+  "agent_rough": 1.9640215299645665,
+  "chunk_jump": 7.9244408107551,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 1032.2575804311782,
+  "steps": 231.562,
+  "catastrophic": 0.082,
+  "near": 0.394,
+  "episodes": 500
+ },
+ "se_global_ns1/fresh/0": {
+  "score": 0.9114116934820565,
+  "success": 0.548,
+  "action_rough": 4.618766784667969,
+  "agent_rough": 2.0960231863780536,
+  "chunk_jump": 8.958225224874978,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 1035.9731296530779,
+  "steps": 234.938,
+  "catastrophic": 0.088,
+  "near": 0.34,
+  "episodes": 500
+ },
+ "se_global_ns025/fresh/0": {
+  "score": 0.9177804149647464,
+  "success": 0.6,
+  "action_rough": 4.52366828918457,
+  "agent_rough": 2.070706802843949,
+  "chunk_jump": 8.56407288117186,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 1017.1106510832416,
+  "steps": 226.28,
+  "catastrophic": 0.082,
+  "near": 0.306,
+  "episodes": 500
+ },
+ "se_global_ns1/fresh/2": {
+  "score": 0.8896312885971992,
+  "success": 0.54,
+  "action_rough": 4.748306751251221,
+  "agent_rough": 2.0761442426538634,
+  "chunk_jump": 9.640461524453677,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 1033.7674414898318,
+  "steps": 235.798,
+  "catastrophic": 0.11,
+  "near": 0.322,
+  "episodes": 500
  }
 }

@@ -92,14 +92,15 @@ class ActionNCA(nn.Module):
     """一维动作 NCA。状态 s 的形状是 (B, C, T_P)，C = 2 个动作通道 + hidden 个隐藏通道。"""
 
     def __init__(self, hidden=22, z_dim=4, emb=16, width=64, fire_rate=0.5, obs_dim=2, z_emb=False, global_ch=False,
-                 seed_pad=True):
+                 seed_pad=True, noise_start=0.0):
         """obs_dim > 2 时观测 = 当前位置（前 2 维）+ 条件向量（例如障碍参数，random_obstacle.py 用）。
         z_emb = True 时 z 也和观测一起进观测编码，广播到每个细胞（默认只写在种子细胞里，要靠更新从左边界传进来）。
         global_ch = True 时每个细胞的感知再加上所有细胞状态的均值（全局感知）。
-        seed_pad = False 时左边界复制第一个细胞而不是种子细胞（当前位置和 z 只从观测编码进来，应配合 z_emb）。"""
+        seed_pad = False 时左边界复制第一个细胞而不是种子细胞（当前位置和 z 只从观测编码进来，应配合 z_emb）。
+        noise_start > 0 时冷启动从噪声出发：动作通道 = 当前位置 + N(0, noise_start²)（归一化坐标，1 ≈ 256 像素）。"""
         super().__init__()
         self.C, self.z_dim, self.fire_rate, self.z_emb = 2 + hidden, z_dim, fire_rate, z_emb
-        self.global_ch, self.seed_pad = global_ch, seed_pad
+        self.global_ch, self.seed_pad, self.noise_start = global_ch, seed_pad, noise_start
         obs_dim = obs_dim + (z_dim if z_emb else 0)
         k = torch.tensor([[0.0, 0.0, 1.0, 0.0, 0.0],     # 恒等：自身状态
                           [0.0, -0.5, 0.0, 0.5, 0.0],    # 一阶差分，半径 1（约等于速度）
@@ -122,10 +123,15 @@ class ActionNCA(nn.Module):
         s[:, 2 + self.z_dim, 0] = 1.0
         return s
 
-    def blank(self, obs):
-        """冷启动：所有细胞先停在当前位置，隐藏通道全为 0。"""
+    def blank(self, obs, eps=None):
+        """冷启动：所有细胞先停在当前位置，隐藏通道全为 0。noise_start > 0 时动作通道再加 noise_start × eps
+        （从噪声出发）；eps 是标准正态噪声 (B, 2, T_P)，不给就现抽（训练时 min-of-K 选中的那一份要原样再用一次）。"""
         s = obs.new_zeros(obs.shape[0], self.C, T_P)
         s[:, :2, :] = obs[:, :2, None]
+        if self.noise_start > 0:
+            if eps is None:
+                eps = torch.randn(obs.shape[0], 2, T_P, device=obs.device, dtype=obs.dtype)
+            s[:, :2, :] = s[:, :2, :] + self.noise_start * eps
         return s
 
     def step(self, s, seed, emb):

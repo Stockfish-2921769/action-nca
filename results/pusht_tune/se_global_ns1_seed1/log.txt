@@ -1,0 +1,26 @@
+/home/ubuntu/venvs/action-nca/bin/python /home/ubuntu/action-nca/pusht.py --job nca --seed 1 --out /home/ubuntu/action-nca/runs/pusht_tune/se_global_ns1_seed1 --device cuda:1 --smooth_weight 1.0 --nca_ema 0.999 --nca_global 1 --noise_start 1.0
+[nca] it      1  cold 22.9018  warm 0.0000  prec 33.3729  chain 0.0  0s
+[nca] it   1000  cold 0.2749  warm 0.3854  prec 0.3271  chain 0.9  88s
+[nca] it   2000  cold 0.1759  warm 0.2372  prec 0.2308  chain 0.9  176s
+[nca] it   3000  cold 0.1743  warm 0.2167  prec 0.2245  chain 0.9  265s
+[nca] it   4000  cold 0.0872  warm 0.1588  prec 0.1138  chain 0.9  353s
+[nca] it   5000  cold 0.1075  warm 0.1740  prec 0.1138  chain 0.9  441s
+[nca] it   6000  cold 0.0635  warm 0.1011  prec 0.0792  chain 0.9  529s
+[nca] it   7000  cold 0.0782  warm 0.0967  prec 0.1224  chain 0.9  617s
+[nca] it   8000  cold 0.0618  warm 0.1399  prec 0.0686  chain 0.9  705s
+[nca] it   9000  cold 0.0504  warm 0.0801  prec 0.0526  chain 0.9  794s
+[nca] it  10000  cold 0.0526  warm 0.0757  prec 0.0474  chain 1.0  883s
+[nca] it  11000  cold 0.0452  warm 0.1008  prec 0.0477  chain 0.9  971s
+[nca] it  12000  cold 0.0386  warm 0.0689  prec 0.0379  chain 0.9  1059s
+[nca] it  13000  cold 0.0286  warm 0.0647  prec 0.0295  chain 0.9  1148s
+[nca] it  14000  cold 0.0274  warm 0.0664  prec 0.0269  chain 0.9  1236s
+[nca] it  15000  cold 0.0282  warm 0.0534  prec 0.0302  chain 0.9  1324s
+[nca] it  16000  cold 0.0287  warm 0.0714  prec 0.0261  chain 0.9  1412s
+[nca] it  17000  cold 0.0333  warm 0.0547  prec 0.0322  chain 0.9  1501s
+[nca] it  18000  cold 0.0260  warm 0.0696  prec 0.0242  chain 0.9  1589s
+[nca] it  19000  cold 0.0219  warm 0.0428  prec 0.0229  chain 0.9  1678s
+[nca] it  20000  cold 0.0259  warm 0.0480  prec 0.0239  chain 0.9  1767s
+trained in 29.5 min, 136576 params
+fresh  score 0.929  success 0.510  action_rough 4.303  agent_rough 1.959  chunk_jump 7.746  calls_per_plan 32.000  ms_per_plan 208.501  steps 234.350
+fixed  score 0.933  success 0.480  action_rough 4.385  agent_rough 1.910  chunk_jump 8.164  calls_per_plan 32.000  ms_per_plan 208.378  steps 247.480
+warm   score 0.927  success 0.410  action_rough 5.947  agent_rough 1.928  chunk_jump 7.590  calls_per_plan 10.579  ms_per_plan 70.491  steps 252.230
