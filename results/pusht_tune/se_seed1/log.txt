@@ -1,0 +1,26 @@
+/home/ubuntu/venvs/action-nca/bin/python /home/ubuntu/action-nca/pusht.py --job nca --seed 1 --out /home/ubuntu/action-nca/runs/pusht_tune/se_seed1 --device cuda:0 --smooth_weight 1.0 --nca_ema 0.999
+[nca] it      1  cold 2.0373  warm 0.0000  prec 1.9035  1s
+[nca] it   1000  cold 0.2050  warm 0.3362  prec 0.2848  308s
+[nca] it   2000  cold 0.1274  warm 0.2400  prec 0.1950  618s
+[nca] it   3000  cold 0.0871  warm 0.1634  prec 0.1197  922s
+[nca] it   4000  cold 0.0838  warm 0.1267  prec 0.1169  1224s
+[nca] it   5000  cold 0.0739  warm 0.1411  prec 0.0842  1532s
+[nca] it   6000  cold 0.0730  warm 0.1244  prec 0.0972  1833s
+[nca] it   7000  cold 0.0570  warm 0.0991  prec 0.0586  2143s
+[nca] it   8000  cold 0.0569  warm 0.1314  prec 0.0576  2448s
+[nca] it   9000  cold 0.0580  warm 0.1181  prec 0.0561  2754s
+[nca] it  10000  cold 0.0564  warm 0.0796  prec 0.0477  3055s
+[nca] it  11000  cold 0.0476  warm 0.0789  prec 0.0450  3366s
+[nca] it  12000  cold 0.0487  warm 0.0682  prec 0.0438  3670s
+[nca] it  13000  cold 0.0463  warm 0.0675  prec 0.0440  3977s
+[nca] it  14000  cold 0.0362  warm 0.0751  prec 0.0354  4279s
+[nca] it  15000  cold 0.0315  warm 0.0560  prec 0.0288  4583s
+[nca] it  16000  cold 0.0317  warm 0.0686  prec 0.0276  4885s
+[nca] it  17000  cold 0.0330  warm 0.0988  prec 0.0310  5193s
+[nca] it  18000  cold 0.0324  warm 0.0733  prec 0.0246  5499s
+[nca] it  19000  cold 0.0257  warm 0.0729  prec 0.0239  5801s
+[nca] it  20000  cold 0.0278  warm 0.0600  prec 0.0265  6108s
+trained in 101.8 min, 120192 params
+fresh  score 0.961  success 0.590  action_rough 4.194  agent_rough 1.992  chunk_jump 7.556  calls_per_plan 32.000  ms_per_plan 335.761  steps 229.620
+fixed  score 0.953  success 0.580  action_rough 4.148  agent_rough 1.965  chunk_jump 7.328  calls_per_plan 32.000  ms_per_plan 300.753  steps 223.590
+warm   score 0.921  success 0.310  action_rough 4.907  agent_rough 1.795  chunk_jump 6.385  calls_per_plan 10.579  ms_per_plan 112.809  steps 268.750

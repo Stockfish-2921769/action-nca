@@ -1,0 +1,36 @@
+/home/ubuntu/venvs/action-nca/bin/python /home/ubuntu/action-nca/pusht.py --job dp --seed 1 --out /home/ubuntu/action-nca/runs/pusht_tune/dp_small_dag_seed1 --device cuda:0 --dp_dims 12 24 48 --dp_kernel 3 --dp_t_dim 32 --dp_groups 4 --extra runs/pusht_tune/dagger/dp_small_seed{seed}.npz
+[dp] it      1  loss 1.0674  1s
+[dp] it   1000  loss 0.0494  25s
+[dp] it   2000  loss 0.0363  51s
+[dp] it   3000  loss 0.0323  76s
+[dp] it   4000  loss 0.0307  101s
+[dp] it   5000  loss 0.0289  123s
+[dp] it   6000  loss 0.0285  144s
+[dp] it   7000  loss 0.0260  166s
+[dp] it   8000  loss 0.0256  187s
+[dp] it   9000  loss 0.0252  207s
+[dp] it  10000  loss 0.0242  229s
+[dp] it  11000  loss 0.0240  252s
+[dp] it  12000  loss 0.0238  270s
+[dp] it  13000  loss 0.0226  287s
+[dp] it  14000  loss 0.0222  305s
+[dp] it  15000  loss 0.0221  323s
+[dp] it  16000  loss 0.0218  342s
+[dp] it  17000  loss 0.0206  359s
+[dp] it  18000  loss 0.0200  377s
+[dp] it  19000  loss 0.0193  395s
+[dp] it  20000  loss 0.0197  413s
+[dp] it  21000  loss 0.0185  431s
+[dp] it  22000  loss 0.0190  449s
+[dp] it  23000  loss 0.0184  467s
+[dp] it  24000  loss 0.0182  484s
+[dp] it  25000  loss 0.0181  502s
+[dp] it  26000  loss 0.0177  520s
+[dp] it  27000  loss 0.0181  538s
+[dp] it  28000  loss 0.0172  556s
+[dp] it  29000  loss 0.0178  574s
+[dp] it  30000  loss 0.0177  591s
+trained in 9.9 min, 125054 params
+fresh  score 0.927  success 0.500  action_rough 3.989  agent_rough 2.016  chunk_jump 8.733  calls_per_plan 10.000  ms_per_plan 87.067  steps 246.290
+fixed  score 0.824  success 0.400  action_rough 3.613  agent_rough 1.717  chunk_jump 8.881  calls_per_plan 10.000  ms_per_plan 60.162  steps 255.080
+warm   score 0.932  success 0.550  action_rough 4.710  agent_rough 1.818  chunk_jump 7.637  calls_per_plan 3.184  ms_per_plan 20.016  steps 236.680

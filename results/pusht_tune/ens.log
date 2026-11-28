@@ -1,0 +1,23 @@
+se (0, 1) eval-seed 0  success 0.57  score 0.907  catastrophic 0.09
+se (0, 1) eval-seed 1  success 0.53  score 0.935  catastrophic 0.06
+se (0, 1) eval-seed 2  success 0.66  score 0.935  catastrophic 0.06
+se (0, 2) eval-seed 0  success 0.64  score 0.906  catastrophic 0.10
+se (0, 2) eval-seed 1  success 0.63  score 0.916  catastrophic 0.08
+se (0, 2) eval-seed 2  success 0.64  score 0.922  catastrophic 0.08
+se (1, 2) eval-seed 0  success 0.59  score 0.915  catastrophic 0.10
+se (1, 2) eval-seed 1  success 0.66  score 0.915  catastrophic 0.09
+se (1, 2) eval-seed 2  success 0.60  score 0.929  catastrophic 0.09
+se (0, 1, 2) eval-seed 0  success 0.65  score 0.896  catastrophic 0.11
+se (0, 1, 2) eval-seed 1  success 0.61  score 0.913  catastrophic 0.09
+se (0, 1, 2) eval-seed 2  success 0.61  score 0.893  catastrophic 0.11
+# 训练种子集成（不重训；每次新 z；计划取平均；评估种子 0,1,2，每格 100 回合）
+
+单个模型的对照见 stall.md 的 control 行（3 个模型各自评估）。
+
+| 模型 | 集成的训练种子 | 得分 | 成功率 | 彻底失败（< 0.5） | 动作粗糙度 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|
+| se | 0,1 | 0.926 ± 0.013 | 58.7% ± 5.4% | 7.0% ± 1.4% | 3.46 ± 0.00 | 690 |
+| se | 0,2 | 0.915 ± 0.007 | 63.7% ± 0.5% | 8.7% ± 0.9% | 3.57 ± 0.03 | 709 |
+| se | 1,2 | 0.919 ± 0.007 | 61.7% ± 3.1% | 9.3% ± 0.5% | 3.59 ± 0.03 | 757 |
+| se | 0,1,2 | 0.901 ± 0.009 | 62.3% ± 1.9% | 10.3% ± 0.9% | 3.21 ± 0.03 | 990 |
+

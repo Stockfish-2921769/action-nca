@@ -1,0 +1,58 @@
+base_fresh     seed 0  score 0.921  success 0.60  rough 6.19  jump 8.23  ms 496  (38s)
+base_warm      seed 0  score 0.937  success 0.22  rough 7.81  jump 7.94  ms 115  (38s)
+cold24         seed 0  score 0.902  success 0.53  rough 6.12  jump 7.94  ms 430  (38s)
+cold48         seed 0  score 0.921  success 0.47  rough 6.84  jump 9.42  ms 791  (49s)
+cold64         seed 0  score 0.912  success 0.49  rough 7.74  jump 11.36  ms 980  (56s)
+warm6          seed 0  score 0.790  success 0.19  rough 12.41  jump 10.99  ms 119  (56s)
+warm16         seed 0  score 0.850  success 0.23  rough 7.13  jump 8.07  ms 307  (56s)
+warm24         seed 0  score 0.862  success 0.30  rough 7.77  jump 9.68  ms 484  (56s)
+warm32         seed 0  score 0.839  success 0.22  rough 8.30  jump 10.44  ms 462  (56s)
+sync_fresh16   seed 0  score 0.888  success 0.61  rough 5.40  jump 8.41  ms 280  (56s)
+sync_fresh32   seed 0  score 0.880  success 0.46  rough 7.47  jump 11.41  ms 382  (56s)
+sync_warm5     seed 0  score 0.911  success 0.37  rough 5.52  jump 7.51  ms 93  (56s)
+sync_warm10    seed 0  score 0.900  success 0.28  rough 6.26  jump 8.13  ms 143  (56s)
+base_fresh     seed 1  score 0.920  success 0.59  rough 6.07  jump 8.55  ms 391  (56s)
+base_warm      seed 1  score 0.913  success 0.43  rough 7.62  jump 7.64  ms 193  (56s)
+cold24         seed 1  score 0.933  success 0.66  rough 6.01  jump 8.19  ms 321  (56s)
+cold48         seed 1  score 0.906  success 0.53  rough 6.63  jump 9.44  ms 680  (60s)
+cold64         seed 1  score 0.891  success 0.54  rough 7.24  jump 10.21  ms 1014  (80s)
+warm6          seed 1  score 0.834  success 0.20  rough 11.43  jump 10.27  ms 136  (80s)
+warm16         seed 1  score 0.878  success 0.38  rough 6.93  jump 7.75  ms 271  (80s)
+warm24         seed 1  score 0.861  success 0.28  rough 7.26  jump 8.76  ms 323  (80s)
+warm32         seed 1  score 0.832  success 0.24  rough 7.74  jump 9.62  ms 556  (80s)
+sync_fresh16   seed 1  score 0.922  success 0.55  rough 5.27  jump 8.07  ms 230  (80s)
+sync_fresh32   seed 1  score 0.837  success 0.40  rough 6.92  jump 10.40  ms 526  (80s)
+sync_warm5     seed 1  score 0.896  success 0.32  rough 5.42  jump 7.08  ms 91  (80s)
+sync_warm10    seed 1  score 0.864  success 0.34  rough 6.17  jump 7.93  ms 106  (80s)
+base_fresh     seed 2  score 0.862  success 0.58  rough 6.33  jump 9.22  ms 468  (80s)
+base_warm      seed 2  score 0.836  success 0.34  rough 8.00  jump 8.67  ms 195  (80s)
+cold24         seed 2  score 0.878  success 0.51  rough 6.33  jump 9.17  ms 338  (80s)
+cold48         seed 2  score 0.891  success 0.48  rough 6.67  jump 10.11  ms 643  (84s)
+cold64         seed 2  score 0.855  success 0.43  rough 7.14  jump 11.42  ms 733  (91s)
+warm6          seed 2  score 0.754  success 0.16  rough 12.35  jump 11.07  ms 83  (91s)
+warm16         seed 2  score 0.887  success 0.34  rough 6.90  jump 8.05  ms 206  (91s)
+warm24         seed 2  score 0.857  success 0.25  rough 7.03  jump 8.67  ms 233  (91s)
+warm32         seed 2  score 0.820  success 0.20  rough 7.67  jump 10.22  ms 305  (91s)
+sync_fresh16   seed 2  score 0.864  success 0.53  rough 5.32  jump 8.75  ms 205  (91s)
+sync_fresh32   seed 2  score 0.902  success 0.55  rough 6.74  jump 10.82  ms 257  (91s)
+sync_warm5     seed 2  score 0.822  success 0.24  rough 5.50  jump 7.98  ms 43  (91s)
+sync_warm10    seed 2  score 0.854  success 0.34  rough 6.05  jump 8.50  ms 119  (91s)
+# NCA 评估时的步数和 fire_rate（不重训；runs/pusht/nca_seed{0,1,2}，每格 100 回合）
+
+| 设置 | 执行方式 | 冷启动步数 | 再生步数 | fire_rate | 得分 | 成功率 | 动作粗糙度 | 衔接跳变 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|---|---|---|
+| base_fresh | fresh | 32 | – | 0.5 | 0.901 ± 0.027 | 59.0% ± 0.8% | 6.20 ± 0.11 | 8.67 ± 0.41 | 452 |
+| base_warm | warm | 32 | 10 | 0.5 | 0.895 ± 0.043 | 33.0% ± 8.6% | 7.81 ± 0.16 | 8.08 ± 0.43 | 167 |
+| cold24 | fresh | 24 | – | 0.5 | 0.904 ± 0.022 | 56.7% ± 6.6% | 6.15 ± 0.14 | 8.43 ± 0.53 | 363 |
+| cold48 | fresh | 48 | – | 0.5 | 0.906 ± 0.012 | 49.3% ± 2.6% | 6.71 ± 0.09 | 9.66 ± 0.32 | 705 |
+| cold64 | fresh | 64 | – | 0.5 | 0.886 ± 0.023 | 48.7% ± 4.5% | 7.37 ± 0.27 | 11.00 ± 0.56 | 909 |
+| warm6 | warm | 32 | 6 | 0.5 | 0.793 ± 0.033 | 18.3% ± 1.7% | 12.06 ± 0.45 | 10.78 ± 0.36 | 113 |
+| warm16 | warm | 32 | 16 | 0.5 | 0.872 ± 0.016 | 31.7% ± 6.3% | 6.99 ± 0.10 | 7.96 ± 0.15 | 261 |
+| warm24 | warm | 32 | 24 | 0.5 | 0.860 ± 0.002 | 27.7% ± 2.1% | 7.35 ± 0.31 | 9.03 ± 0.46 | 347 |
+| warm32 | warm | 32 | 32 | 0.5 | 0.830 ± 0.008 | 22.0% ± 1.6% | 7.90 ± 0.28 | 10.09 ± 0.35 | 441 |
+| sync_fresh16 | fresh | 16 | – | 1.0 | 0.891 ± 0.024 | 56.3% ± 3.4% | 5.33 ± 0.05 | 8.41 ± 0.28 | 238 |
+| sync_fresh32 | fresh | 32 | – | 1.0 | 0.873 ± 0.027 | 47.0% ± 6.2% | 7.05 ± 0.31 | 10.88 ± 0.41 | 388 |
+| sync_warm5 | warm | 16 | 5 | 1.0 | 0.876 ± 0.039 | 31.0% ± 5.4% | 5.48 ± 0.04 | 7.52 ± 0.37 | 75 |
+| sync_warm10 | warm | 16 | 10 | 1.0 | 0.873 ± 0.020 | 32.0% ± 2.8% | 6.16 ± 0.09 | 8.19 ± 0.24 | 123 |
+
+EVALDONE

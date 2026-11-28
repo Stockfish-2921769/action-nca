@@ -1,0 +1,30 @@
+base_fresh     seed 0  score 0.921  success 0.60  rough 6.19  jump 8.23  ms 301  (22s)
+base_fixed     seed 0  score 0.895  success 0.53  rough 6.18  jump 8.23  ms 509  (39s)
+z0_fresh       seed 0  score 0.918  success 0.53  rough 6.15  jump 8.26  ms 467  (39s)
+z0_fixed       seed 0  score 0.919  success 0.63  rough 6.21  jump 8.43  ms 471  (39s)
+z0.5_fresh     seed 0  score 0.935  success 0.61  rough 6.16  jump 8.09  ms 514  (39s)
+z0.5_fixed     seed 0  score 0.900  success 0.57  rough 6.14  jump 8.17  ms 372  (39s)
+base_fresh     seed 1  score 0.920  success 0.59  rough 6.07  jump 8.55  ms 373  (39s)
+base_fixed     seed 1  score 0.923  success 0.63  rough 6.01  jump 8.13  ms 345  (39s)
+z0_fresh       seed 1  score 0.915  success 0.64  rough 6.07  jump 8.57  ms 425  (39s)
+z0_fixed       seed 1  score 0.933  success 0.63  rough 6.12  jump 8.43  ms 438  (53s)
+z0.5_fresh     seed 1  score 0.924  success 0.59  rough 6.06  jump 8.27  ms 447  (59s)
+z0.5_fixed     seed 1  score 0.928  success 0.58  rough 5.99  jump 8.21  ms 467  (61s)
+base_fresh     seed 2  score 0.862  success 0.58  rough 6.33  jump 9.22  ms 478  (64s)
+base_fixed     seed 2  score 0.897  success 0.55  rough 6.15  jump 8.73  ms 390  (64s)
+z0_fresh       seed 2  score 0.868  success 0.52  rough 6.14  jump 9.03  ms 376  (64s)
+z0_fixed       seed 2  score 0.880  success 0.60  rough 6.26  jump 8.98  ms 481  (69s)
+z0.5_fresh     seed 2  score 0.877  success 0.57  rough 6.03  jump 8.85  ms 449  (72s)
+z0.5_fixed     seed 2  score 0.866  success 0.50  rough 6.26  jump 9.17  ms 404  (72s)
+# NCA 评估时的设置（不重训；runs/pusht/nca_seed{0,1,2}，每格 100 回合）
+
+| 设置 | 执行方式 | 冷启动步数 | 再生步数 | fire_rate | 每几次冷启动 | z 缩放 | 得分 | 成功率 | 动作粗糙度 | 衔接跳变 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| base_fresh | fresh | 32 | – | 0.5 | – | 1 | 0.901 ± 0.027 | 59.0% ± 0.8% | 6.20 ± 0.11 | 8.67 ± 0.41 | 384 |
+| base_fixed | fixed | 32 | – | 0.5 | – | 1 | 0.905 ± 0.013 | 57.0% ± 4.3% | 6.12 ± 0.07 | 8.36 ± 0.26 | 415 |
+| z0_fresh | fresh | 32 | – | 0.5 | – | 0 | 0.900 ± 0.023 | 56.3% ± 5.4% | 6.12 ± 0.03 | 8.62 ± 0.32 | 422 |
+| z0_fixed | fixed | 32 | – | 0.5 | – | 0 | 0.910 ± 0.022 | 62.0% ± 1.4% | 6.20 ± 0.06 | 8.61 ± 0.26 | 463 |
+| z0.5_fresh | fresh | 32 | – | 0.5 | – | 0.5 | 0.912 ± 0.025 | 59.0% ± 1.6% | 6.08 ± 0.05 | 8.40 ± 0.32 | 470 |
+| z0.5_fixed | fixed | 32 | – | 0.5 | – | 0.5 | 0.898 ± 0.026 | 55.0% ± 3.6% | 6.13 ± 0.11 | 8.52 ± 0.46 | 414 |
+
+EVALDONE

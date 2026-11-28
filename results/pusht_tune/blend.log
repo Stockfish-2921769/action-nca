@@ -1,0 +1,56 @@
+se α 0.75 warm 10 seed 0  success 0.22  score 0.842  (27s)
+se α 0.75 warm 10 seed 1  success 0.35  score 0.860  (28s)
+se α 0.75 warm 10 seed 2  success 0.31  score 0.811  (33s)
+se α 0.5 warm 10 seed 0  success 0.20  score 0.805  (33s)
+se α 0.5 warm 10 seed 1  success 0.24  score 0.792  (33s)
+se α 0.5 warm 10 seed 2  success 0.20  score 0.752  (33s)
+se α 0.25 warm 10 seed 0  success 0.13  score 0.674  (35s)
+se α 0.25 warm 10 seed 1  success 0.21  score 0.715  (35s)
+se α 0.25 warm 10 seed 2  success 0.15  score 0.657  (35s)
+se α 0.5 warm 20 seed 0  success 0.53  score 0.913  (41s)
+se α 0.5 warm 20 seed 1  success 0.51  score 0.920  (41s)
+se α 0.5 warm 20 seed 2  success 0.42  score 0.905  (41s)
+se α 0.25 warm 20 seed 0  success 0.44  score 0.886  (41s)
+se α 0.25 warm 20 seed 1  success 0.54  score 0.944  (41s)
+se α 0.25 warm 20 seed 2  success 0.37  score 0.881  (41s)
+se α 0.0 warm 16 seed 0  success 0.31  score 0.838  (41s)
+se α 0.0 warm 16 seed 1  success 0.36  score 0.866  (41s)
+se α 0.0 warm 16 seed 2  success 0.29  score 0.804  (41s)
+se_jit8 α 0.75 warm 10 seed 0  success 0.30  score 0.823  (48s)
+se_jit8 α 0.75 warm 10 seed 1  success 0.22  score 0.796  (48s)
+se_jit8 α 0.75 warm 10 seed 2  success 0.37  score 0.867  (60s)
+se_jit8 α 0.5 warm 10 seed 0  success 0.24  score 0.756  (60s)
+se_jit8 α 0.5 warm 10 seed 1  success 0.18  score 0.698  (60s)
+se_jit8 α 0.5 warm 10 seed 2  success 0.28  score 0.819  (60s)
+se_jit8 α 0.25 warm 10 seed 0  success 0.11  score 0.709  (60s)
+se_jit8 α 0.25 warm 10 seed 1  success 0.11  score 0.719  (60s)
+se_jit8 α 0.25 warm 10 seed 2  success 0.16  score 0.773  (60s)
+se_jit8 α 0.5 warm 20 seed 0  success 0.48  score 0.907  (62s)
+se_jit8 α 0.5 warm 20 seed 1  success 0.47  score 0.930  (64s)
+se_jit8 α 0.5 warm 20 seed 2  success 0.47  score 0.894  (64s)
+se_jit8 α 0.25 warm 20 seed 0  success 0.45  score 0.903  (64s)
+se_jit8 α 0.25 warm 20 seed 1  success 0.47  score 0.892  (64s)
+se_jit8 α 0.25 warm 20 seed 2  success 0.54  score 0.891  (64s)
+se_jit8 α 0.0 warm 16 seed 0  success 0.33  score 0.857  (64s)
+se_jit8 α 0.0 warm 16 seed 1  success 0.18  score 0.801  (64s)
+se_jit8 α 0.0 warm 16 seed 2  success 0.31  score 0.818  (65s)
+# 部分冷启动（不重训；种子 0,1,2，每格 100 回合，z 每回合固定）
+
+再生前：动作通道 = α·旧计划 + (1−α)·当前位置，隐藏通道 × α。α = 1 是普通再生（见 summary.md），α = 0 是短冷启动。
+
+| 模型 | α | 再生步数 | 得分 | 成功率 | 动作粗糙度 | 衔接跳变 | NCA 步数 / 次规划 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|---|---|
+| se | 0.75 | 10 | 0.838 ± 0.020 | 29.3% ± 5.4% | 5.01 ± 0.29 | 6.95 ± 0.59 | 10.6 | 182 |
+| se | 0.5 | 10 | 0.783 ± 0.022 | 21.3% ± 1.9% | 5.51 ± 0.18 | 7.87 ± 0.45 | 10.6 | 167 |
+| se | 0.25 | 10 | 0.682 ± 0.024 | 16.3% ± 3.4% | 6.25 ± 0.11 | 8.85 ± 0.49 | 10.6 | 185 |
+| se | 0.5 | 20 | 0.913 ± 0.006 | 48.7% ± 4.8% | 4.14 ± 0.03 | 6.96 ± 0.37 | 20.3 | 378 |
+| se | 0.25 | 20 | 0.904 ± 0.028 | 45.0% ± 7.0% | 4.40 ± 0.14 | 7.53 ± 0.55 | 20.3 | 313 |
+| se | 0 | 16 | 0.836 ± 0.025 | 32.0% ± 2.9% | 5.27 ± 0.22 | 8.84 ± 0.95 | 16.4 | 260 |
+| se_jit8 | 0.75 | 10 | 0.829 ± 0.029 | 29.7% ± 6.1% | 5.90 ± 0.10 | 8.59 ± 0.32 | 10.6 | 178 |
+| se_jit8 | 0.5 | 10 | 0.757 ± 0.049 | 23.3% ± 4.1% | 6.00 ± 0.06 | 8.87 ± 0.18 | 10.6 | 173 |
+| se_jit8 | 0.25 | 10 | 0.733 ± 0.028 | 12.7% ± 2.4% | 6.25 ± 0.14 | 9.09 ± 0.36 | 10.6 | 160 |
+| se_jit8 | 0.5 | 20 | 0.911 ± 0.015 | 47.3% ± 0.5% | 4.66 ± 0.18 | 8.05 ± 0.60 | 20.3 | 332 |
+| se_jit8 | 0.25 | 20 | 0.895 ± 0.006 | 48.7% ± 3.9% | 4.67 ± 0.17 | 8.40 ± 0.60 | 20.3 | 282 |
+| se_jit8 | 0 | 16 | 0.825 ± 0.024 | 27.3% ± 6.6% | 5.09 ± 0.17 | 8.61 ± 0.35 | 16.4 | 237 |
+
+BLENDDONE

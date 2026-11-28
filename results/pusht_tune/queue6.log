@@ -1,0 +1,8 @@
+21:45 launch se_global seed 0 on cuda:1 (free 6589 MiB, our jobs 7)
+22:00 launch se_nopad seed 0 on cuda:0 (free 5166 MiB, our jobs 8)
+22:24 launch se_k16 seed 2 on cuda:1 (free 6757 MiB, our jobs 8)
+22:57 launch se_global seed 1 on cuda:1 (free 6745 MiB, our jobs 8)
+23:24 launch se_nopad seed 1 on cuda:0 (free 11430 MiB, our jobs 7)
+23:27 launch se_global seed 2 on cuda:0 (free 19036 MiB, our jobs 4)
+23:30 launch se_nopad seed 2 on cuda:0 (free 16505 MiB, our jobs 5)
+QUEUEDONE

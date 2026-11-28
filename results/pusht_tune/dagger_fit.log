@@ -1,0 +1,58 @@
+fit se_global seed 0  cat: n 1000 label8 58 d8 25/57/58 err 41/7/5  ok: n 1000 label8 55 d8 51/53/54 err 14/9/4
+fit se_global seed 1  cat: n 1000 label8 49 d8 21/47/49 err 38/7/4  ok: n 1000 label8 58 d8 52/55/56 err 15/9/4
+fit se_global seed 2  cat: n 1000 label8 57 d8 14/57/57 err 46/7/4  ok: n 1000 label8 57 d8 57/57/57 err 14/8/4
+fit dp_small seed 0  cat: n 760 label8 45 d8 39/45/46 err 34/14/6  ok: n 1000 label8 58 d8 57/57/58 err 20/16/4
+fit dp_small seed 1  cat: n 912 label8 46 d8 25/44/46 err 33/11/5  ok: n 1000 label8 58 d8 57/56/57 err 22/17/4
+fit dp_small seed 2  cat: n 1000 label8 50 d8 40/47/49 err 35/15/5  ok: n 1000 label8 53 d8 53/52/53 err 19/15/4
+cover se_global seed 0  catastrophic 0.060  n 66.000  nn_demo 0.467  nn_dagger 0.268  d8 10.202
+cover se_global seed 1  catastrophic 0.096  n 123.000  nn_demo 0.421  nn_dagger 0.248  d8 6.308
+cover se_global seed 2  catastrophic 0.106  n 138.000  nn_demo 0.332  nn_dagger 0.201  d8 9.226
+cover se_global_dag seed 0  catastrophic 0.084  n 114.000  nn_demo 0.421  nn_dagger 0.311  d8 7.266
+cover se_global_dag seed 1  catastrophic 0.098  n 141.000  nn_demo 0.391  nn_dagger 0.277  d8 7.815
+cover se_global_dag seed 2  catastrophic 0.080  n 111.000  nn_demo 0.449  nn_dagger 0.313  d8 5.940
+cover dp_small seed 0  catastrophic 0.040  n 27.000  nn_demo 0.655  nn_dagger 0.377  d8 12.775
+cover dp_small seed 1  catastrophic 0.038  n 48.000  nn_demo 0.579  nn_dagger 0.128  d8 11.487
+cover dp_small seed 2  catastrophic 0.060  n 45.000  nn_demo 0.586  nn_dagger 0.252  d8 15.830
+cover dp_small_dag seed 0  catastrophic 0.086  n 105.000  nn_demo 0.467  nn_dagger 0.325  d8 10.985
+cover dp_small_dag seed 1  catastrophic 0.072  n 72.000  nn_demo 0.432  nn_dagger 0.286  d8 14.539
+cover dp_small_dag seed 2  catastrophic 0.094  n 120.000  nn_demo 0.494  nn_dagger 0.321  d8 10.987
+# DAgger 之后学会了没有
+
+## 学生自己的 DAgger 数据上
+
+状态 = `--stage dagger` 收集的样本（学生每次新 z / 新噪声闭环时每 8 步一个观测，环境种子 200000 起），分成彻底失败回合和其余回合，各随机取至多 1000 个；这些状态和标签都在 DAgger 后的模型的训练集里。每个状态上，DAgger 前的学生、DAgger 后的学生（<学生>_dag）和老师（同种子大 DP）各采 8 个每次新 z / 新噪声的冷启动计划。第 8 步 = 计划第 8 步离当前推杆位置的距离（中位数，像素）；离标签 = 计划和大 DP 标签 16 步逐步距离的平均（每个状态先对 8 个计划取平均或最小，再取中位数，像素）。老师离标签的距离是同一个分布两次采样的差，相当于能拟合到的下限。
+
+| 学生 | 种子 | 状态 | 状态数 | 标签第 8 步 | 第 8 步：前 / 后 / 老师 | 离标签（平均）：前 / 后 / 老师 | 离标签（8 个里最近）：前 / 后 / 老师 |
+|---|---|---|---|---|---|---|---|
+| dp_small | 0 | 彻底失败回合 | 760 | 45 | 39 / 45 / 46 | 34 / 14 / 6 | 23 / 8 / 3 |
+| dp_small | 0 | 其余回合 | 1000 | 58 | 57 / 57 / 58 | 20 / 16 / 4 | 10 / 8 / 2 |
+| dp_small | 1 | 彻底失败回合 | 912 | 46 | 25 / 44 / 46 | 33 / 11 / 5 | 24 / 6 / 3 |
+| dp_small | 1 | 其余回合 | 1000 | 58 | 57 / 56 / 57 | 22 / 17 / 4 | 10 / 8 / 2 |
+| dp_small | 2 | 彻底失败回合 | 1000 | 50 | 40 / 47 / 49 | 35 / 15 / 5 | 24 / 8 / 3 |
+| dp_small | 2 | 其余回合 | 1000 | 53 | 53 / 52 / 53 | 19 / 15 / 4 | 10 / 8 / 2 |
+| se_global | 0 | 彻底失败回合 | 1000 | 58 | 25 / 57 / 58 | 41 / 7 / 5 | 38 / 6 / 2 |
+| se_global | 0 | 其余回合 | 1000 | 55 | 51 / 53 / 54 | 14 / 9 / 4 | 11 / 6 / 2 |
+| se_global | 1 | 彻底失败回合 | 1000 | 49 | 21 / 47 / 49 | 38 / 7 / 4 | 34 / 5 / 2 |
+| se_global | 1 | 其余回合 | 1000 | 58 | 52 / 55 / 56 | 15 / 9 / 4 | 12 / 6 / 2 |
+| se_global | 2 | 彻底失败回合 | 1000 | 57 | 14 / 57 / 57 | 46 / 7 / 4 | 43 / 5 / 2 |
+| se_global | 2 | 其余回合 | 1000 | 57 | 57 / 57 / 57 | 14 / 8 / 4 | 12 / 6 / 2 |
+
+## 测试回合里卡住的状态有没有被 DAgger 数据覆盖
+
+和 `--stage final` 同样的测试回合（每个种子 500 个，测试种子 100000 起，每次新 z / 新噪声）再闭环一遍，取卡住的状态（彻底失败回合里第一次卡住的时刻及其后 8、16 步，同 stall.md）。离示范、离 DAgger 状态 = 到最近的示范观测、到最近的 DAgger 状态（学生的 DAgger 数据，DAgger 后的模型训练时见过）的距离（12 维特征，中位数）；参照：DAgger 数据里彻底失败回合的状态离示范 0.36–0.50，其余回合 0.08–0.09。第 8 步 = 模型自己在这些状态上的计划（中位数，像素）。
+
+| 模型 | 种子 | 彻底失败 | 卡住的状态数 | 离示范 | 离 DAgger 状态 | 自己的计划第 8 步 |
+|---|---|---|---|---|---|---|
+| se_global | 0 | 6.0% | 66 | 0.467 | 0.268 | 10 |
+| se_global | 1 | 9.6% | 123 | 0.421 | 0.248 | 6 |
+| se_global | 2 | 10.6% | 138 | 0.332 | 0.201 | 9 |
+| se_global_dag | 0 | 8.4% | 114 | 0.421 | 0.311 | 7 |
+| se_global_dag | 1 | 9.8% | 141 | 0.391 | 0.277 | 8 |
+| se_global_dag | 2 | 8.0% | 111 | 0.449 | 0.313 | 6 |
+| dp_small | 0 | 4.0% | 27 | 0.655 | 0.377 | 13 |
+| dp_small | 1 | 3.8% | 48 | 0.579 | 0.128 | 11 |
+| dp_small | 2 | 6.0% | 45 | 0.586 | 0.252 | 16 |
+| dp_small_dag | 0 | 8.6% | 105 | 0.467 | 0.325 | 11 |
+| dp_small_dag | 1 | 7.2% | 72 | 0.432 | 0.286 | 15 |
+| dp_small_dag | 2 | 9.4% | 120 | 0.494 | 0.321 | 11 |
+

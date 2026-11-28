@@ -91,10 +91,16 @@ def seg_hits_rects(a, b, rects, n=12):
 class ActionNCA(nn.Module):
     """一维动作 NCA。状态 s 的形状是 (B, C, T_P)，C = 2 个动作通道 + hidden 个隐藏通道。"""
 
-    def __init__(self, hidden=22, z_dim=4, emb=16, width=64, fire_rate=0.5, obs_dim=2):
-        """obs_dim > 2 时观测 = 当前位置（前 2 维）+ 条件向量（例如障碍参数，random_obstacle.py 用）。"""
+    def __init__(self, hidden=22, z_dim=4, emb=16, width=64, fire_rate=0.5, obs_dim=2, z_emb=False, global_ch=False,
+                 seed_pad=True):
+        """obs_dim > 2 时观测 = 当前位置（前 2 维）+ 条件向量（例如障碍参数，random_obstacle.py 用）。
+        z_emb = True 时 z 也和观测一起进观测编码，广播到每个细胞（默认只写在种子细胞里，要靠更新从左边界传进来）。
+        global_ch = True 时每个细胞的感知再加上所有细胞状态的均值（全局感知）。
+        seed_pad = False 时左边界复制第一个细胞而不是种子细胞（当前位置和 z 只从观测编码进来，应配合 z_emb）。"""
         super().__init__()
-        self.C, self.z_dim, self.fire_rate = 2 + hidden, z_dim, fire_rate
+        self.C, self.z_dim, self.fire_rate, self.z_emb = 2 + hidden, z_dim, fire_rate, z_emb
+        self.global_ch, self.seed_pad = global_ch, seed_pad
+        obs_dim = obs_dim + (z_dim if z_emb else 0)
         k = torch.tensor([[0.0, 0.0, 1.0, 0.0, 0.0],     # 恒等：自身状态
                           [0.0, -0.5, 0.0, 0.5, 0.0],    # 一阶差分，半径 1（约等于速度）
                           [0.0, 1.0, -2.0, 1.0, 0.0],    # 二阶差分，半径 1（约等于加速度）
@@ -104,7 +110,7 @@ class ActionNCA(nn.Module):
         self.register_buffer("pos", ((torch.arange(T_P) + 1.0) / T_P).view(1, 1, T_P))
         self.obs_net = nn.Sequential(nn.Linear(obs_dim, emb), nn.ReLU(), nn.Linear(emb, emb))
         self.update = nn.Sequential(
-            nn.Conv1d(5 * self.C + 1 + emb, width, 1), nn.ReLU(),
+            nn.Conv1d(5 * self.C + 1 + emb + (self.C if global_ch else 0), width, 1), nn.ReLU(),
             nn.Conv1d(width, self.C, 1, bias=False))
         nn.init.zeros_(self.update[-1].weight)   # 初始行为是“什么都不做”
 
@@ -124,17 +130,20 @@ class ActionNCA(nn.Module):
 
     def step(self, s, seed, emb):
         B = s.shape[0]
-        x = torch.cat([seed, seed, s, s[:, :, -1:], s[:, :, -1:]], dim=2)   # 左边界是种子，右边界复制
-        h = torch.cat([F.conv1d(x, self.kernel, groups=self.C),
-                       self.pos.expand(B, 1, T_P),
-                       emb[:, :, None].expand(B, emb.shape[1], T_P)], dim=1)
+        left = seed if self.seed_pad else s[:, :, :1]
+        x = torch.cat([left, left, s, s[:, :, -1:], s[:, :, -1:]], dim=2)   # 左边界是种子，右边界复制
+        feats = [F.conv1d(x, self.kernel, groups=self.C), self.pos.expand(B, 1, T_P),
+                 emb[:, :, None].expand(B, emb.shape[1], T_P)]
+        if self.global_ch:                                                    # 全局感知：所有细胞的均值
+            feats.append(s.mean(2, keepdim=True).expand(B, self.C, T_P))
+        h = torch.cat(feats, dim=1)
         ds = self.update(h)
         if self.fire_rate < 1.0:                                              # 随机异步更新
             ds = ds * (torch.rand(B, 1, T_P, device=s.device) < self.fire_rate).float()
         return s + ds
 
     def grow(self, s, obs, z, steps, frames=None):
-        seed, emb = self.seed(obs, z), self.obs_net(obs)
+        seed, emb = self.seed(obs, z), self.obs_net(torch.cat([obs, z], 1) if self.z_emb else obs)
         for _ in range(steps):
             s = self.step(s, seed, emb)
             if frames is not None:

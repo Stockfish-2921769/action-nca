@@ -1,0 +1,6 @@
+fixed: 21 episodes match, showing episode 13
+new: 18 episodes match, showing episode 5
+both: 5 episodes match, showing episode 95
+dp_new: 18 episodes match, showing episode 31
+{'se_global': {'cat': 30, 'succ': 309}, 'se_global_dag': {'cat': 42, 'succ': 295}, 'dp_small': {'cat': 20, 'succ': 297}, 'dp_small_dag': {'cat': 43, 'succ': 246}}
+catastrophic overlap: {'se_global|se_global@rerun': {'a': 30, 'b': 36, 'both': 18}, 'se_global|se_global#other': {'a': 30, 'b': 39, 'both': 7}, 'se_global|se_global_dag': {'a': 30, 'b': 42, 'both': 5}, 'dp_small|dp_small@rerun': {'a': 20, 'b': 17, 'both': 8}, 'dp_small|dp_small#other': {'a': 20, 'b': 21, 'both': 4}, 'dp_small|dp_small_dag': {'a': 20, 'b': 43, 'both': 6}}

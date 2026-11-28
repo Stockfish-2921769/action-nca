@@ -1,0 +1,33 @@
+base_fresh     seed 0  score 0.926  success 0.67  rough 4.31  jump 7.99  ms 396  (29s)
+base_fixed     seed 0  score 0.925  success 0.62  rough 4.18  jump 7.63  ms 532  (38s)
+z0_fresh       seed 0  score 0.930  success 0.60  rough 4.28  jump 7.62  ms 450  (38s)
+z0_fixed       seed 0  score 0.915  success 0.62  rough 4.22  jump 7.81  ms 496  (38s)
+z0.5_fresh     seed 0  score 0.927  success 0.51  rough 4.24  jump 7.79  ms 377  (38s)
+z0.5_fixed     seed 0  score 0.927  success 0.55  rough 4.19  jump 7.71  ms 335  (38s)
+base_fresh     seed 1  score 0.961  success 0.59  rough 4.19  jump 7.56  ms 434  (38s)
+base_fixed     seed 1  score 0.953  success 0.58  rough 4.15  jump 7.33  ms 506  (38s)
+z0_fresh       seed 1  score 0.925  success 0.51  rough 4.18  jump 7.69  ms 308  (38s)
+z0_fixed       seed 1  score 0.951  success 0.54  rough 4.08  jump 6.98  ms 338  (46s)
+z0.5_fresh     seed 1  score 0.937  success 0.55  rough 4.21  jump 7.75  ms 458  (58s)
+z0.5_fixed     seed 1  score 0.967  success 0.58  rough 4.00  jump 6.64  ms 405  (58s)
+base_fresh     seed 2  score 0.877  success 0.48  rough 4.64  jump 9.31  ms 406  (60s)
+base_fixed     seed 2  score 0.863  success 0.39  rough 4.52  jump 9.19  ms 376  (60s)
+z0_fresh       seed 2  score 0.877  success 0.46  rough 4.50  jump 8.88  ms 392  (62s)
+z0_fixed       seed 2  score 0.916  success 0.56  rough 4.50  jump 8.92  ms 369  (65s)
+z0.5_fresh     seed 2  score 0.866  success 0.48  rough 4.52  jump 8.94  ms 424  (68s)
+z0.5_fixed     seed 2  score 0.901  success 0.58  rough 4.57  jump 8.94  ms 409  (68s)
+# NCA 评估时的设置（不重训；runs/pusht_tune/se_seed{0,1,2}，每格 100 回合）
+
+| 设置 | 执行方式 | 冷启动步数 | 再生步数 | fire_rate | 每几次冷启动 | z 缩放 | 得分 | 成功率 | 动作粗糙度 | 衔接跳变 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| base_fresh | fresh | 32 | – | 0.5 | – | 1 | 0.921 ± 0.035 | 58.0% ± 7.8% | 4.38 ± 0.19 | 8.29 ± 0.75 | 412 |
+| base_fixed | fixed | 32 | – | 0.5 | – | 1 | 0.914 ± 0.038 | 53.0% ± 10.0% | 4.28 ± 0.17 | 8.05 ± 0.82 | 471 |
+| base_warm | warm | 32 | 10 | 0.5 | – | 1 | 0.879 ± 0.035 | 29.3% ± 1.7% | 5.05 ± 0.19 | 6.85 ± 0.45 | 162 |
+| refresh2 | warm | 32 | 10 | 0.5 | 2 | 1 | 0.925 ± 0.018 | 44.0% ± 6.2% | 4.68 ± 0.13 | 7.61 ± 0.41 | 302 |
+| refresh4 | warm | 32 | 10 | 0.5 | 4 | 1 | 0.905 ± 0.018 | 43.7% ± 3.1% | 4.95 ± 0.15 | 7.52 ± 0.29 | 227 |
+| refresh8 | warm | 32 | 10 | 0.5 | 8 | 1 | 0.906 ± 0.021 | 37.0% ± 4.3% | 5.02 ± 0.14 | 7.05 ± 0.38 | 214 |
+| z0_fresh | fresh | 32 | – | 0.5 | – | 0 | 0.911 ± 0.024 | 52.3% ± 5.8% | 4.32 ± 0.13 | 8.06 ± 0.57 | 383 |
+| z0_fixed | fixed | 32 | – | 0.5 | – | 0 | 0.927 ± 0.017 | 57.3% ± 3.4% | 4.27 ± 0.17 | 7.91 ± 0.79 | 401 |
+| z0.5_fresh | fresh | 32 | – | 0.5 | – | 0.5 | 0.910 ± 0.031 | 51.3% ± 2.9% | 4.32 ± 0.14 | 8.16 ± 0.55 | 419 |
+| z0.5_fixed | fixed | 32 | – | 0.5 | – | 0.5 | 0.932 ± 0.027 | 57.0% ± 1.4% | 4.25 ± 0.24 | 7.76 ± 0.94 | 383 |
+

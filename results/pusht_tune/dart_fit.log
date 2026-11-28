@@ -1,0 +1,70 @@
+fit se_global seed 0  cat: n 1000 label8 58 d8 25/51/58 err 41/13/5  ok: n 1000 label8 55 d8 51/52/54 err 14/10/4  far: n 1000 label8 73 d8 78/73/73 err 29/9/4  near: n 1000 label8 55 d8 57/54/55 err 15/9/4
+fit se_global seed 1  cat: n 1000 label8 49 d8 21/45/49 err 38/12/4  ok: n 1000 label8 58 d8 52/56/56 err 15/10/4  far: n 1000 label8 79 d8 81/79/79 err 30/9/4  near: n 1000 label8 57 d8 58/58/57 err 14/9/4
+fit se_global seed 2  cat: n 1000 label8 57 d8 14/58/57 err 46/13/4  ok: n 1000 label8 57 d8 57/57/57 err 14/10/4  far: n 1000 label8 77 d8 77/76/77 err 29/9/4  near: n 1000 label8 53 d8 53/51/53 err 15/9/4
+fit dp_small seed 0  cat: n 760 label8 45 d8 39/47/46 err 34/13/6  ok: n 1000 label8 58 d8 57/56/58 err 20/14/4  far: n 1000 label8 74 d8 78/71/73 err 28/12/5  near: n 1000 label8 57 d8 57/56/57 err 20/13/4
+fit dp_small seed 1  cat: n 912 label8 46 d8 25/42/46 err 33/12/5  ok: n 1000 label8 58 d8 57/57/57 err 22/15/4  far: n 1000 label8 76 d8 76/75/75 err 29/12/4  near: n 1000 label8 57 d8 57/56/58 err 20/14/4
+fit dp_small seed 2  cat: n 1000 label8 50 d8 40/48/49 err 35/13/5  ok: n 1000 label8 53 d8 53/52/53 err 19/13/4  far: n 1000 label8 76 d8 77/75/76 err 26/12/4  near: n 1000 label8 54 d8 55/53/55 err 20/13/4
+cover se_global seed 0  catastrophic 0.060  n 66.000  nn_demo 0.467  nn_extra 0.228  d8 10.202
+cover se_global seed 1  catastrophic 0.096  n 123.000  nn_demo 0.421  nn_extra 0.206  d8 6.308
+cover se_global seed 2  catastrophic 0.106  n 138.000  nn_demo 0.332  nn_extra 0.187  d8 9.226
+cover se_global_dart seed 0  catastrophic 0.070  n 99.000  nn_demo 0.464  nn_extra 0.182  d8 7.083
+cover se_global_dart seed 1  catastrophic 0.074  n 105.000  nn_demo 0.421  nn_extra 0.129  d8 6.626
+cover se_global_dart seed 2  catastrophic 0.076  n 105.000  nn_demo 0.425  nn_extra 0.153  d8 7.250
+cover dp_small seed 0  catastrophic 0.040  n 27.000  nn_demo 0.655  nn_extra 0.155  d8 12.775
+cover dp_small seed 1  catastrophic 0.038  n 48.000  nn_demo 0.579  nn_extra 0.196  d8 11.487
+cover dp_small seed 2  catastrophic 0.060  n 45.000  nn_demo 0.586  nn_extra 0.159  d8 15.830
+cover dp_small_dart seed 0  catastrophic 0.076  n 105.000  nn_demo 0.461  nn_extra 0.170  d8 8.259
+cover dp_small_dart seed 1  catastrophic 0.084  n 108.000  nn_demo 0.499  nn_extra 0.177  d8 9.123
+cover dp_small_dart seed 2  catastrophic 0.054  n 72.000  nn_demo 0.448  nn_extra 0.131  d8 8.827
+# DART 之后学会了没有
+
+## 补数据前后的学生和老师在同一批状态上
+
+DAgger 数据 = `--stage dagger` 收集的样本（学生每次新 z / 新噪声闭环时每 8 步一个观测，环境种子 200000 起），分成彻底失败回合和其余回合；DART 后的模型没见过这些状态（它的额外数据是老师加扰动闭环收的），这是推广的检验。DART 数据 = `--stage dart` 收集的样本（环境种子 300000 起），分成离示范远（≥ 0.25）和其余；这些在 DART 后的模型的训练集里。每组随机取至多 1000 个状态。每个状态上，补数据前的学生、补数据后的学生（<学生>_dart）和老师（同种子大 DP）各采 8 个每次新 z / 新噪声的冷启动计划。第 8 步 = 计划第 8 步离当前推杆位置的距离（中位数，像素）；离标签 = 计划和大 DP 标签 16 步逐步距离的平均（每个状态先对 8 个计划取平均或最小，再取中位数，像素）。老师离标签的距离是同一个分布两次采样的差，相当于能拟合到的下限。
+
+| 学生 | 种子 | 状态 | 状态数 | 标签第 8 步 | 第 8 步：前 / 后 / 老师 | 离标签（平均）：前 / 后 / 老师 | 离标签（8 个里最近）：前 / 后 / 老师 |
+|---|---|---|---|---|---|---|---|
+| dp_small | 0 | DAgger 数据·彻底失败回合 | 760 | 45 | 39 / 47 / 46 | 34 / 13 / 6 | 23 / 8 / 3 |
+| dp_small | 0 | DAgger 数据·其余回合 | 1000 | 58 | 57 / 56 / 58 | 20 / 14 / 4 | 10 / 8 / 2 |
+| dp_small | 0 | DART 数据·离示范 ≥ 0.25 | 1000 | 74 | 78 / 71 / 73 | 28 / 12 / 5 | 17 / 7 / 2 |
+| dp_small | 0 | DART 数据·其余 | 1000 | 57 | 57 / 56 / 57 | 20 / 13 / 4 | 11 / 7 / 2 |
+| dp_small | 1 | DAgger 数据·彻底失败回合 | 912 | 46 | 25 / 42 / 46 | 33 / 12 / 5 | 24 / 7 / 3 |
+| dp_small | 1 | DAgger 数据·其余回合 | 1000 | 58 | 57 / 57 / 57 | 22 / 15 / 4 | 10 / 8 / 2 |
+| dp_small | 1 | DART 数据·离示范 ≥ 0.25 | 1000 | 76 | 76 / 75 / 75 | 29 / 12 / 4 | 17 / 7 / 2 |
+| dp_small | 1 | DART 数据·其余 | 1000 | 57 | 57 / 56 / 58 | 20 / 14 / 4 | 10 / 8 / 2 |
+| dp_small | 2 | DAgger 数据·彻底失败回合 | 1000 | 50 | 40 / 48 / 49 | 35 / 13 / 5 | 24 / 8 / 3 |
+| dp_small | 2 | DAgger 数据·其余回合 | 1000 | 53 | 53 / 52 / 53 | 19 / 13 / 4 | 10 / 8 / 2 |
+| dp_small | 2 | DART 数据·离示范 ≥ 0.25 | 1000 | 76 | 77 / 75 / 76 | 26 / 12 / 4 | 16 / 7 / 2 |
+| dp_small | 2 | DART 数据·其余 | 1000 | 54 | 55 / 53 / 55 | 20 / 13 / 4 | 11 / 7 / 2 |
+| se_global | 0 | DAgger 数据·彻底失败回合 | 1000 | 58 | 25 / 51 / 58 | 41 / 13 / 5 | 38 / 11 / 2 |
+| se_global | 0 | DAgger 数据·其余回合 | 1000 | 55 | 51 / 52 / 54 | 14 / 10 / 4 | 11 / 8 / 2 |
+| se_global | 0 | DART 数据·离示范 ≥ 0.25 | 1000 | 73 | 78 / 73 / 73 | 29 / 9 / 4 | 26 / 7 / 3 |
+| se_global | 0 | DART 数据·其余 | 1000 | 55 | 57 / 54 / 55 | 15 / 9 / 4 | 12 / 7 / 2 |
+| se_global | 1 | DAgger 数据·彻底失败回合 | 1000 | 49 | 21 / 45 / 49 | 38 / 12 / 4 | 34 / 10 / 2 |
+| se_global | 1 | DAgger 数据·其余回合 | 1000 | 58 | 52 / 56 / 56 | 15 / 10 / 4 | 12 / 8 / 2 |
+| se_global | 1 | DART 数据·离示范 ≥ 0.25 | 1000 | 79 | 81 / 79 / 79 | 30 / 9 / 4 | 26 / 7 / 2 |
+| se_global | 1 | DART 数据·其余 | 1000 | 57 | 58 / 58 / 57 | 14 / 9 / 4 | 12 / 7 / 2 |
+| se_global | 2 | DAgger 数据·彻底失败回合 | 1000 | 57 | 14 / 58 / 57 | 46 / 13 / 4 | 43 / 11 / 2 |
+| se_global | 2 | DAgger 数据·其余回合 | 1000 | 57 | 57 / 57 / 57 | 14 / 10 / 4 | 12 / 8 / 2 |
+| se_global | 2 | DART 数据·离示范 ≥ 0.25 | 1000 | 77 | 77 / 76 / 77 | 29 / 9 / 4 | 26 / 7 / 2 |
+| se_global | 2 | DART 数据·其余 | 1000 | 53 | 53 / 51 / 53 | 15 / 9 / 4 | 12 / 7 / 2 |
+
+## 测试回合里卡住的状态有没有被 DART 数据覆盖
+
+和 `--stage final` 同样的测试回合（每个种子 500 个，测试种子 100000 起，每次新 z / 新噪声）再闭环一遍，取卡住的状态（彻底失败回合里第一次卡住的时刻及其后 8、16 步，同 stall.md）。离示范、离 DART 数据 = 到最近的示范观测、到最近的 DART 样本（补数据后的模型训练时见过）的距离（12 维特征，中位数）；参照：DAgger 数据里彻底失败回合的状态离示范 0.36–0.50，其余回合 0.08–0.09。第 8 步 = 模型自己在这些状态上的计划（中位数，像素）。
+
+| 模型 | 种子 | 彻底失败 | 卡住的状态数 | 离示范 | 离 DART 数据 | 自己的计划第 8 步 |
+|---|---|---|---|---|---|---|
+| se_global | 0 | 6.0% | 66 | 0.467 | 0.228 | 10 |
+| se_global | 1 | 9.6% | 123 | 0.421 | 0.206 | 6 |
+| se_global | 2 | 10.6% | 138 | 0.332 | 0.187 | 9 |
+| se_global_dart | 0 | 7.0% | 99 | 0.464 | 0.182 | 7 |
+| se_global_dart | 1 | 7.4% | 105 | 0.421 | 0.129 | 7 |
+| se_global_dart | 2 | 7.6% | 105 | 0.425 | 0.153 | 7 |
+| dp_small | 0 | 4.0% | 27 | 0.655 | 0.155 | 13 |
+| dp_small | 1 | 3.8% | 48 | 0.579 | 0.196 | 11 |
+| dp_small | 2 | 6.0% | 45 | 0.586 | 0.159 | 16 |
+| dp_small_dart | 0 | 7.6% | 105 | 0.461 | 0.170 | 8 |
+| dp_small_dart | 1 | 8.4% | 108 | 0.499 | 0.177 | 9 |
+| dp_small_dart | 2 | 5.4% | 72 | 0.448 | 0.131 | 9 |
+

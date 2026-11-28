@@ -1,0 +1,9 @@
+03:06 start
+se_global_rescue2: 100 个回合，得分 0.958，成功 0.73，彻底失败 0.05
+dp_small_rescue2: 100 个回合，得分 0.969，成功 0.63，彻底失败 0.03
+dp: 100 个回合，得分 0.974，成功 0.62，彻底失败 0.02
+se_global: 100 个回合，得分 0.915，成功 0.52，彻底失败 0.08
+/home/ubuntu/action-nca/results/pusht_tune/traj.gif: 151 帧，895×785，1.0 MB
+stall：测试回合 100012（se_global 的第 1 个彻底失败，共 8 个）；se_global 最好 0.45，se_global_rescue2 最好 1.00
+/home/ubuntu/action-nca/results/pusht_tune/stall.gif: 151 帧，607×479，0.4 MB
+03:07 GIFDONE

@@ -1,0 +1,9 @@
+失败 se_zemb_seed0，0.1 分钟
+失败 se_noise_seed2，0.1 分钟
+失败 se_exec_seed1，0.1 分钟
+失败 se_zemb_seed2，0.1 分钟
+完成 se_exec_seed0，190.3 分钟
+完成 se_noise_seed1，190.4 分钟
+完成 se_zemb_seed1，190.5 分钟
+完成 se_exec_seed2，190.5 分钟
+TRAINDONE

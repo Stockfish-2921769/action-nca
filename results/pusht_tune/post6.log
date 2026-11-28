@@ -1,0 +1,12 @@
+01:47 start
+01:47 no other stage running
+01:47 se_nopad seed 0 done
+01:48 early cat/attract done
+se_global seed 2  success 0.61  score 0.922  catastrophic 0.07
+se_nopad seed 0  success 0.57  score 0.915  catastrophic 0.10
+se_nopad seed 1  success 0.56  score 0.940  catastrophic 0.06
+se_nopad seed 2  success 0.47  score 0.883  catastrophic 0.11
+| se_global | 0,1,2 | 0.920 ± 0.005 | 61.3% ± 2.1% | 8.0% ± 0.8% | 54 | 7.2 |
+| se_nopad | 0,1,2 | 0.913 ± 0.023 | 53.3% ± 4.5% | 9.0% ± 2.2% | 54 | 10.0 |
+01:48 all round-6 models done
+01:49 POST6DONE

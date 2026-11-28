@@ -1,0 +1,209 @@
+[
+ {
+  "model": "se",
+  "members": [
+   0,
+   1
+  ],
+  "seed": 0,
+  "score": 0.9068363860343415,
+  "success": 0.57,
+  "action_rough": 3.4595932960510254,
+  "agent_rough": 1.7802471959761481,
+  "chunk_jump": 6.69088225250301,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 716.9919708486352,
+  "steps": 225.69,
+  "catastrophic": 0.09
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   1
+  ],
+  "seed": 1,
+  "score": 0.9348477168817075,
+  "success": 0.53,
+  "action_rough": 3.4521095752716064,
+  "agent_rough": 1.8055376851897886,
+  "chunk_jump": 6.537460962742649,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 613.1011537692852,
+  "steps": 235.94,
+  "catastrophic": 0.06
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   1
+  ],
+  "seed": 2,
+  "score": 0.9353257392627455,
+  "success": 0.66,
+  "action_rough": 3.453732967376709,
+  "agent_rough": 1.815447330917473,
+  "chunk_jump": 6.360021236099127,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 740.5567212753292,
+  "steps": 220.38,
+  "catastrophic": 0.06
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   2
+  ],
+  "seed": 0,
+  "score": 0.9056185529597446,
+  "success": 0.64,
+  "action_rough": 3.5712649822235107,
+  "agent_rough": 1.846941497099348,
+  "chunk_jump": 7.242830256861737,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 805.2187994318573,
+  "steps": 222.25,
+  "catastrophic": 0.1
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   2
+  ],
+  "seed": 1,
+  "score": 0.9164360685520804,
+  "success": 0.63,
+  "action_rough": 3.601736068725586,
+  "agent_rough": 1.8576866782073547,
+  "chunk_jump": 7.113502315149587,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 743.3522417222297,
+  "steps": 231.53,
+  "catastrophic": 0.08
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   2
+  ],
+  "seed": 2,
+  "score": 0.9220103997142302,
+  "success": 0.64,
+  "action_rough": 3.5362792015075684,
+  "agent_rough": 1.821603372663126,
+  "chunk_jump": 7.122435263161229,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 578.2211239841815,
+  "steps": 223.71,
+  "catastrophic": 0.08
+ },
+ {
+  "model": "se",
+  "members": [
+   1,
+   2
+  ],
+  "seed": 0,
+  "score": 0.9145324941278753,
+  "success": 0.59,
+  "action_rough": 3.551748275756836,
+  "agent_rough": 1.7977041915491543,
+  "chunk_jump": 7.160251042433275,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 722.866413165129,
+  "steps": 236.64,
+  "catastrophic": 0.1
+ },
+ {
+  "model": "se",
+  "members": [
+   1,
+   2
+  ],
+  "seed": 1,
+  "score": 0.9145924431021453,
+  "success": 0.66,
+  "action_rough": 3.633594274520874,
+  "agent_rough": 1.870782118258175,
+  "chunk_jump": 7.254286270561484,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 790.7377017759964,
+  "steps": 223.85,
+  "catastrophic": 0.09
+ },
+ {
+  "model": "se",
+  "members": [
+   1,
+   2
+  ],
+  "seed": 2,
+  "score": 0.9285571298798871,
+  "success": 0.6,
+  "action_rough": 3.593489646911621,
+  "agent_rough": 1.8433394499410682,
+  "chunk_jump": 7.013256465164225,
+  "calls_per_plan": 64.0,
+  "ms_per_plan": 756.2422932211408,
+  "steps": 229.88,
+  "catastrophic": 0.09
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   1,
+   2
+  ],
+  "seed": 0,
+  "score": 0.8962745456553125,
+  "success": 0.65,
+  "action_rough": 3.180114507675171,
+  "agent_rough": 1.7272793775916537,
+  "chunk_jump": 6.30782336025423,
+  "calls_per_plan": 96.0,
+  "ms_per_plan": 969.988665212632,
+  "steps": 218.79,
+  "catastrophic": 0.11
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   1,
+   2
+  ],
+  "seed": 1,
+  "score": 0.9126889166426647,
+  "success": 0.61,
+  "action_rough": 3.247879981994629,
+  "agent_rough": 1.7637840290275149,
+  "chunk_jump": 6.517442198410106,
+  "calls_per_plan": 96.0,
+  "ms_per_plan": 999.3199430847246,
+  "steps": 227.38,
+  "catastrophic": 0.09
+ },
+ {
+  "model": "se",
+  "members": [
+   0,
+   1,
+   2
+  ],
+  "seed": 2,
+  "score": 0.8930598238801806,
+  "success": 0.61,
+  "action_rough": 3.2151126861572266,
+  "agent_rough": 1.7110432793468735,
+  "chunk_jump": 6.689649814263019,
+  "calls_per_plan": 96.0,
+  "ms_per_plan": 1000.177776839241,
+  "steps": 224.5,
+  "catastrophic": 0.11
+ }
+]

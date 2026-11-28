@@ -1,0 +1,92 @@
+{
+ "train_minutes": 165.92852289676665,
+ "params": 120192,
+ "n_samples": 25650,
+ "args": {
+  "all": false,
+  "aggregate_only": false,
+  "job": "nca",
+  "seed": 0,
+  "seeds": [
+   0,
+   1,
+   2
+  ],
+  "variants": [
+   "nca",
+   "dp",
+   "dp_small"
+  ],
+  "device": "cuda:0",
+  "batch": 256,
+  "obs_noise": 0.0,
+  "nca_iters": 40000,
+  "nca_lr": 0.001,
+  "nca_hidden": 62,
+  "nca_emb": 64,
+  "nca_width": 256,
+  "z_dim": 4,
+  "k": 8,
+  "pool": 4096,
+  "cold_min": 24,
+  "cold_max": 40,
+  "warm_min": 6,
+  "warm_max": 14,
+  "prec_weight": 1.0,
+  "prec_samples": 2,
+  "prec_radius": 0.05,
+  "cold_steps": 32,
+  "warm_steps": 10,
+  "fire_rate": 0.5,
+  "nca_ema": 0.999,
+  "smooth_weight": 1.0,
+  "regrow_noise": 0.0,
+  "dp_iters": 30000,
+  "dp_lr": 0.001,
+  "dp_dims": [
+   64,
+   128,
+   256
+  ],
+  "dp_kernel": 5,
+  "dp_t_dim": 64,
+  "dp_groups": 8,
+  "dp_steps": 10,
+  "dp_warm_steps": 3,
+  "episodes": 100,
+  "log_every": 1000,
+  "jobs": 6,
+  "out": "/home/ubuntu/action-nca/runs/pusht_tune/se_long_seed0",
+  "runs": "/home/ubuntu/action-nca/runs/pusht"
+ },
+ "fresh": {
+  "score": 0.8797475401344005,
+  "success": 0.6,
+  "action_rough": 4.248636245727539,
+  "agent_rough": 2.0974887054387734,
+  "chunk_jump": 8.814201654843055,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 219.76436860246682,
+  "steps": 234.4
+ },
+ "fixed": {
+  "score": 0.9108428128695166,
+  "success": 0.6,
+  "action_rough": 4.103551864624023,
+  "agent_rough": 2.0874079780051873,
+  "chunk_jump": 8.30846116089855,
+  "calls_per_plan": 32.0,
+  "ms_per_plan": 238.18624422787443,
+  "steps": 227.34
+ },
+ "warm": {
+  "score": 0.8593152432480566,
+  "success": 0.31,
+  "action_rough": 4.57020902633667,
+  "agent_rough": 1.8027358314474895,
+  "chunk_jump": 5.944875370008595,
+  "calls_per_plan": 10.578947368421053,
+  "ms_per_plan": 83.29119572513981,
+  "steps": 269.33
+ }
+}

@@ -1,0 +1,39 @@
+dp_small fresh seed 0  score 0.956  success 0.594  catastrophic 0.040
+dp_small fresh seed 1  score 0.950  success 0.520  catastrophic 0.038
+dp_small fresh seed 2  score 0.933  success 0.554  catastrophic 0.060
+dp_small warm seed 0  score 0.954  success 0.534  catastrophic 0.036
+dp_small warm seed 1  score 0.939  success 0.494  catastrophic 0.048
+dp_small warm seed 2  score 0.924  success 0.586  catastrophic 0.068
+dp fresh seed 0  score 0.946  success 0.594  catastrophic 0.048
+dp fresh seed 1  score 0.951  success 0.612  catastrophic 0.046
+dp fresh seed 2  score 0.958  success 0.644  catastrophic 0.036
+dp fixed seed 0  score 0.947  success 0.594  catastrophic 0.048
+dp fixed seed 1  score 0.953  success 0.636  catastrophic 0.044
+dp fixed seed 2  score 0.952  success 0.586  catastrophic 0.040
+se fresh seed 0  score 0.914  success 0.582  catastrophic 0.088
+se fresh seed 1  score 0.918  success 0.564  catastrophic 0.074
+se fresh seed 2  score 0.917  success 0.542  catastrophic 0.080
+se_zemb fresh seed 0  score 0.927  success 0.530  catastrophic 0.076
+se_zemb fresh seed 1  score 0.894  success 0.554  catastrophic 0.106
+se_zemb fresh seed 2  score 0.883  success 0.522  catastrophic 0.126
+se_exec fresh seed 0  score 0.934  success 0.592  catastrophic 0.058
+se_exec fresh seed 1  score 0.888  success 0.630  catastrophic 0.118
+se_exec fresh seed 2  score 0.936  success 0.606  catastrophic 0.064
+se_k16 fresh seed 0  score 0.901  success 0.550  catastrophic 0.092
+se_k16 fresh seed 1  score 0.917  success 0.644  catastrophic 0.088
+se_k16 fresh seed 2  score 0.900  success 0.506  catastrophic 0.098
+# 最终对比（每个种子 500 个测试回合，测试种子 100000–100499；均值 ± 种子间标准差）
+
+彻底失败 = 最好覆盖率 < 0.5；差一点 = 最好覆盖率 ≥ 0.9 但没有成功。毫秒数是 500 个环境一批、有负载的服务器上测的，只看量级。
+
+| 模型 | 执行方式 | 种子 | 得分 | 成功率 | 彻底失败 | 差一点 | 动作粗糙度 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|---|---|
+| dp_small | fresh | 0,1,2 | 0.946 ± 0.010 | 55.6% ± 3.0% | 4.6% ± 1.0% | 38.1% ± 3.1% | 4.30 ± 0.05 | 411 |
+| dp_small | warm | 0,1,2 | 0.939 ± 0.012 | 53.8% ± 3.8% | 5.1% ± 1.3% | 38.4% ± 5.1% | 4.82 ± 0.22 | 139 |
+| dp | fresh | 0,1,2 | 0.952 ± 0.005 | 61.7% ± 2.1% | 4.3% ± 0.5% | 33.0% ± 1.8% | 3.99 ± 0.13 | 4389 |
+| dp | fixed | 0,1,2 | 0.950 ± 0.003 | 60.5% ± 2.2% | 4.4% ± 0.3% | 33.8% ± 2.3% | 3.89 ± 0.12 | 4249 |
+| se | fresh | 0,1,2 | 0.916 ± 0.002 | 56.3% ± 1.6% | 8.1% ± 0.6% | 33.7% ± 1.5% | 4.38 ± 0.12 | 1441 |
+| se_zemb | fresh | 0,1,2 | 0.901 ± 0.019 | 53.5% ± 1.4% | 10.3% ± 2.1% | 34.1% ± 1.6% | 4.22 ± 0.16 | 1432 |
+| se_exec | fresh | 0,1,2 | 0.919 ± 0.022 | 60.9% ± 1.6% | 8.0% ± 2.7% | 29.4% ± 4.3% | 4.62 ± 0.00 | 1366 |
+| se_k16 | fresh | 0,1,2 | 0.906 ± 0.008 | 56.7% ± 5.8% | 9.3% ± 0.4% | 31.7% ± 4.7% | 4.43 ± 0.09 | 1258 |
+

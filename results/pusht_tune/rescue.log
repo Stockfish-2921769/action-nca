@@ -1,0 +1,108 @@
+collect se_global_dart seed 0: 4000 episodes, catastrophic 281, stalled 269  (272s)
+collect se_global_dart seed 1: 4000 episodes, catastrophic 317, stalled 292  (272s)
+collect se_global_dart seed 2: 4000 episodes, catastrophic 321, stalled 277  (272s)
+collect dp_small_dart seed 0: 4000 episodes, catastrophic 318, stalled 289  (272s)
+collect dp_small_dart seed 1: 4000 episodes, catastrophic 358, stalled 296  (272s)
+collect dp_small_dart seed 2: 4000 episodes, catastrophic 348, stalled 279  (272s)
+try se_global_dart seed 0 dp #0: escaped 0.16 success 0.06  (349s)
+try se_global_dart seed 0 dp #1: escaped 0.14 success 0.04  (352s)
+try se_global_dart seed 0 dp #2: escaped 0.14 success 0.05  (377s)
+try se_global_dart seed 0 dp_noise #0: escaped 0.28 success 0.02  (377s)
+try se_global_dart seed 0 dp_noise #1: escaped 0.28 success 0.02  (377s)
+try se_global_dart seed 0 dp_noise #2: escaped 0.30 success 0.02  (377s)
+try se_global_dart seed 0 dp_small #0: escaped 0.55 success 0.22  (377s)
+try se_global_dart seed 0 dp_small #1: escaped 0.57 success 0.22  (377s)
+try se_global_dart seed 0 dp_small #2: escaped 0.58 success 0.21  (377s)
+try se_global_dart seed 0 nca #0: escaped 0.51 success 0.21  (377s)
+try se_global_dart seed 0 nca #1: escaped 0.48 success 0.20  (377s)
+try se_global_dart seed 0 nca #2: escaped 0.50 success 0.21  (377s)
+try se_global_dart seed 1 dp #0: escaped 0.21 success 0.06  (377s)
+try se_global_dart seed 1 dp #1: escaped 0.20 success 0.08  (377s)
+try se_global_dart seed 1 dp #2: escaped 0.20 success 0.08  (383s)
+try se_global_dart seed 1 dp_noise #0: escaped 0.26 success 0.04  (383s)
+try se_global_dart seed 1 dp_noise #1: escaped 0.23 success 0.03  (413s)
+try se_global_dart seed 1 dp_noise #2: escaped 0.23 success 0.02  (418s)
+try se_global_dart seed 1 dp_small #0: escaped 0.43 success 0.17  (418s)
+try se_global_dart seed 1 dp_small #1: escaped 0.41 success 0.15  (418s)
+try se_global_dart seed 1 dp_small #2: escaped 0.46 success 0.19  (418s)
+try se_global_dart seed 1 nca #0: escaped 0.40 success 0.18  (418s)
+try se_global_dart seed 1 nca #1: escaped 0.41 success 0.17  (418s)
+try se_global_dart seed 1 nca #2: escaped 0.42 success 0.17  (418s)
+try se_global_dart seed 2 dp #0: escaped 0.12 success 0.04  (438s)
+try se_global_dart seed 2 dp #1: escaped 0.10 success 0.04  (438s)
+try se_global_dart seed 2 dp #2: escaped 0.12 success 0.04  (449s)
+try se_global_dart seed 2 dp_noise #0: escaped 0.23 success 0.03  (449s)
+try se_global_dart seed 2 dp_noise #1: escaped 0.22 success 0.02  (454s)
+try se_global_dart seed 2 dp_noise #2: escaped 0.24 success 0.02  (471s)
+try se_global_dart seed 2 dp_small #0: escaped 0.31 success 0.11  (471s)
+try se_global_dart seed 2 dp_small #1: escaped 0.40 success 0.14  (471s)
+try se_global_dart seed 2 dp_small #2: escaped 0.38 success 0.10  (471s)
+try se_global_dart seed 2 nca #0: escaped 0.31 success 0.12  (471s)
+try se_global_dart seed 2 nca #1: escaped 0.31 success 0.14  (471s)
+try se_global_dart seed 2 nca #2: escaped 0.31 success 0.12  (471s)
+try dp_small_dart seed 0 dp #0: escaped 0.06 success 0.01  (471s)
+try dp_small_dart seed 0 dp #1: escaped 0.07 success 0.03  (489s)
+try dp_small_dart seed 0 dp #2: escaped 0.07 success 0.02  (489s)
+try dp_small_dart seed 0 dp_noise #0: escaped 0.16 success 0.01  (525s)
+try dp_small_dart seed 0 dp_noise #1: escaped 0.16 success 0.01  (525s)
+try dp_small_dart seed 0 dp_noise #2: escaped 0.14 success 0.01  (525s)
+try dp_small_dart seed 0 dp_small #0: escaped 0.38 success 0.13  (525s)
+try dp_small_dart seed 0 dp_small #1: escaped 0.40 success 0.13  (525s)
+try dp_small_dart seed 0 dp_small #2: escaped 0.42 success 0.12  (525s)
+try dp_small_dart seed 0 nca #0: escaped 0.40 success 0.13  (525s)
+try dp_small_dart seed 0 nca #1: escaped 0.41 success 0.18  (525s)
+try dp_small_dart seed 0 nca #2: escaped 0.41 success 0.14  (525s)
+try dp_small_dart seed 1 dp #0: escaped 0.09 success 0.04  (550s)
+try dp_small_dart seed 1 dp #1: escaped 0.10 success 0.03  (561s)
+try dp_small_dart seed 1 dp #2: escaped 0.10 success 0.03  (561s)
+try dp_small_dart seed 1 dp_noise #0: escaped 0.16 success 0.02  (563s)
+try dp_small_dart seed 1 dp_noise #1: escaped 0.12 success 0.00  (579s)
+try dp_small_dart seed 1 dp_noise #2: escaped 0.15 success 0.01  (579s)
+try dp_small_dart seed 1 dp_small #0: escaped 0.29 success 0.11  (579s)
+try dp_small_dart seed 1 dp_small #1: escaped 0.34 success 0.12  (579s)
+try dp_small_dart seed 1 dp_small #2: escaped 0.30 success 0.10  (579s)
+try dp_small_dart seed 1 nca #0: escaped 0.20 success 0.06  (579s)
+try dp_small_dart seed 1 nca #1: escaped 0.23 success 0.07  (579s)
+try dp_small_dart seed 1 nca #2: escaped 0.21 success 0.06  (579s)
+try dp_small_dart seed 2 dp #0: escaped 0.07 success 0.03  (586s)
+try dp_small_dart seed 2 dp #1: escaped 0.08 success 0.04  (586s)
+try dp_small_dart seed 2 dp #2: escaped 0.09 success 0.03  (586s)
+try dp_small_dart seed 2 dp_noise #0: escaped 0.14 success 0.01  (586s)
+try dp_small_dart seed 2 dp_noise #1: escaped 0.15 success 0.02  (586s)
+try dp_small_dart seed 2 dp_noise #2: escaped 0.14 success 0.01  (600s)
+try dp_small_dart seed 2 dp_small #0: escaped 0.28 success 0.11  (600s)
+try dp_small_dart seed 2 dp_small #1: escaped 0.30 success 0.09  (600s)
+try dp_small_dart seed 2 dp_small #2: escaped 0.31 success 0.12  (600s)
+try dp_small_dart seed 2 nca #0: escaped 0.24 success 0.10  (600s)
+try dp_small_dart seed 2 nca #1: escaped 0.23 success 0.10  (600s)
+try dp_small_dart seed 2 nca #2: escaped 0.23 success 0.11  (600s)
+se_global_dart seed 0: rescued 224/269, samples 37024
+se_global_dart seed 1: rescued 223/292, samples 34305
+se_global_dart seed 2: rescued 184/277, samples 29202
+dp_small_dart seed 0: rescued 217/289, samples 35614
+dp_small_dart seed 1: rescued 182/296, samples 30559
+dp_small_dart seed 2: rescued 166/279, samples 28186
+# 按结果挑标签的数据（学生每次新 z / 新噪声闭环，环境种子 400000 起）
+
+卡住的状态 = 彻底失败回合（最好覆盖率 < 0.5）里第一次卡住的时刻（之后 8、16 步推杆位移都 < 10 像素）。每个卡住的状态上，老师、老师 + 扰动（σ = 15）、小 DP、NCA各接手 3 次（每次新 z / 新噪声，换随机数种子），跑到第 300 步；老师 = 同种子大 DP，小 DP、NCA = 同种子、只用示范训练的（dp_small、se_global）。救出 = 整个回合的最好覆盖率 ≥ 0.5；“3 次里任一次”是每个规划器单独算的。每个卡住的状态挑最好的一次（成功的里步数最少的，都没成功时最好覆盖率最高的），救出来的才留下：从接手到覆盖率最高的那一步，每一步一个样本，标签是实际执行的 16 个动作。示范共 25650 个样本，DART 数据每个种子约 3.6 万个。
+
+| 学生 | 种子 | 回合 | 得分 | 彻底失败 | 卡住的状态 | 接手时刻（中位数） | 老师救出（3 次里任一次） | 老师 + 扰动（σ = 15）救出（3 次里任一次） | 小 DP救出（3 次里任一次） | NCA救出（3 次里任一次） | 老师或小 DP | 全部里任一次 | 其中成功 | 样本 | 每段步数（中位数） |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| se_global_dart | 0 | 4000 | 0.923 | 7.0% | 269 | 64 | 18% | 41% | 70% | 61% | 72% | 83% | 62% | 37024 | 164 |
+| se_global_dart | 1 | 4000 | 0.918 | 7.9% | 292 | 80 | 26% | 36% | 56% | 51% | 59% | 76% | 48% | 34305 | 160 |
+| se_global_dart | 2 | 4000 | 0.917 | 8.0% | 277 | 80 | 14% | 36% | 49% | 40% | 50% | 66% | 35% | 29202 | 158 |
+| dp_small_dart | 0 | 4000 | 0.914 | 8.0% | 289 | 72 | 9% | 27% | 55% | 53% | 60% | 75% | 49% | 35614 | 167 |
+| dp_small_dart | 1 | 4000 | 0.907 | 8.9% | 296 | 100 | 12% | 25% | 44% | 31% | 46% | 61% | 30% | 30559 | 168 |
+| dp_small_dart | 2 | 4000 | 0.906 | 8.7% | 279 | 88 | 10% | 24% | 42% | 33% | 43% | 59% | 34% | 28186 | 169 |
+
+挑出来的那一次来自哪个规划器（救出来的状态数）：
+
+| 学生 | 种子 | 老师 | 老师 + 扰动（σ = 15） | 小 DP | NCA |
+|---|---|---|---|---|---|
+| se_global_dart | 0 | 11 | 9 | 116 | 88 |
+| se_global_dart | 1 | 22 | 13 | 105 | 83 |
+| se_global_dart | 2 | 13 | 23 | 81 | 67 |
+| dp_small_dart | 0 | 10 | 13 | 89 | 105 |
+| dp_small_dart | 1 | 16 | 16 | 96 | 54 |
+| dp_small_dart | 2 | 6 | 15 | 76 | 69 |
+

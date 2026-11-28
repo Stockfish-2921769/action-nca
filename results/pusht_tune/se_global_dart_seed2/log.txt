@@ -1,0 +1,55 @@
+/home/ubuntu/venvs/action-nca/bin/python /home/ubuntu/action-nca/pusht.py --job nca --seed 2 --out /home/ubuntu/action-nca/runs/pusht_tune/se_global_dart_seed2 --device cuda:1 --smooth_weight 1.0 --nca_ema 0.999 --nca_global 1 --extra runs/pusht_tune/dart/dp_seed{seed}.npz --scale_iters 1
+scale_iters: 61903 samples (2.41 x demos) -> nca_iters 48000, dp_iters 72000
+[nca] it      1  cold 1.7159  warm 0.0000  prec 1.6422  chain 0.0  0s
+[nca] it   1000  cold 0.1708  warm 0.3402  prec 0.2657  chain 2.2  360s
+[nca] it   2000  cold 0.1437  warm 0.2971  prec 0.2035  chain 2.2  718s
+[nca] it   3000  cold 0.1117  warm 0.1797  prec 0.1611  chain 2.2  1074s
+[nca] it   4000  cold 0.0919  warm 0.1859  prec 0.1328  chain 2.2  1267s
+[nca] it   5000  cold 0.1227  warm 0.1839  prec 0.1618  chain 2.2  1464s
+[nca] it   6000  cold 0.0834  warm 0.1881  prec 0.1072  chain 2.2  1657s
+[nca] it   7000  cold 0.0822  warm 0.1150  prec 0.1109  chain 2.2  1851s
+[nca] it   8000  cold 0.0969  warm 0.1238  prec 0.1201  chain 2.2  2045s
+[nca] it   9000  cold 0.0667  warm 0.1183  prec 0.0874  chain 2.1  2240s
+[nca] it  10000  cold 0.0831  warm 0.0931  prec 0.1117  chain 2.1  2434s
+[nca] it  11000  cold 0.0839  warm 0.0990  prec 0.1014  chain 2.2  2630s
+[nca] it  12000  cold 0.0670  warm 0.1091  prec 0.0805  chain 2.2  2825s
+[nca] it  13000  cold 0.0618  warm 0.0851  prec 0.0811  chain 2.1  3020s
+[nca] it  14000  cold 0.0634  warm 0.0944  prec 0.0810  chain 2.2  3214s
+[nca] it  15000  cold 0.0658  warm 0.1283  prec 0.0728  chain 2.2  3409s
+[nca] it  16000  cold 0.0640  warm 0.0854  prec 0.0797  chain 2.2  3601s
+[nca] it  17000  cold 0.0694  warm 0.0955  prec 0.0898  chain 2.2  3797s
+[nca] it  18000  cold 0.0613  warm 0.0871  prec 0.0750  chain 2.2  3991s
+[nca] it  19000  cold 0.0528  warm 0.0748  prec 0.0644  chain 2.2  4186s
+[nca] it  20000  cold 0.0489  warm 0.0803  prec 0.0589  chain 2.2  4380s
+[nca] it  21000  cold 0.0618  warm 0.1061  prec 0.0676  chain 2.1  4574s
+[nca] it  22000  cold 0.0469  warm 0.0936  prec 0.0545  chain 2.2  4769s
+[nca] it  23000  cold 0.0460  warm 0.0703  prec 0.0493  chain 2.2  4964s
+[nca] it  24000  cold 0.0544  warm 0.0633  prec 0.0502  chain 2.2  5159s
+[nca] it  25000  cold 0.0403  warm 0.0548  prec 0.0458  chain 2.2  5354s
+[nca] it  26000  cold 0.0486  warm 0.0839  prec 0.0473  chain 2.2  5548s
+[nca] it  27000  cold 0.0475  warm 0.0813  prec 0.0534  chain 2.2  5744s
+[nca] it  28000  cold 0.0483  warm 0.0583  prec 0.0521  chain 2.2  5939s
+[nca] it  29000  cold 0.0416  warm 0.0463  prec 0.0468  chain 2.2  6133s
+[nca] it  30000  cold 0.0367  warm 0.0503  prec 0.0373  chain 2.2  6328s
+[nca] it  31000  cold 0.0454  warm 0.0748  prec 0.0455  chain 2.2  6522s
+[nca] it  32000  cold 0.0442  warm 0.0637  prec 0.0419  chain 2.2  6718s
+[nca] it  33000  cold 0.0427  warm 0.0537  prec 0.0391  chain 2.1  6912s
+[nca] it  34000  cold 0.0401  warm 0.0558  prec 0.0382  chain 2.2  7106s
+[nca] it  35000  cold 0.0375  warm 0.0631  prec 0.0349  chain 2.2  7301s
+[nca] it  36000  cold 0.0393  warm 0.0461  prec 0.0375  chain 2.2  7495s
+[nca] it  37000  cold 0.0391  warm 0.0506  prec 0.0343  chain 2.2  7690s
+[nca] it  38000  cold 0.0404  warm 0.0569  prec 0.0373  chain 2.2  7885s
+[nca] it  39000  cold 0.0387  warm 0.0642  prec 0.0389  chain 2.2  8080s
+[nca] it  40000  cold 0.0403  warm 0.0478  prec 0.0346  chain 2.2  8274s
+[nca] it  41000  cold 0.0403  warm 0.0406  prec 0.0312  chain 2.2  8469s
+[nca] it  42000  cold 0.0296  warm 0.0491  prec 0.0294  chain 2.2  8663s
+[nca] it  43000  cold 0.0356  warm 0.0476  prec 0.0323  chain 2.1  8857s
+[nca] it  44000  cold 0.0301  warm 0.0469  prec 0.0307  chain 2.2  9051s
+[nca] it  45000  cold 0.0332  warm 0.0489  prec 0.0311  chain 2.2  9245s
+[nca] it  46000  cold 0.0341  warm 0.0862  prec 0.0308  chain 2.2  9439s
+[nca] it  47000  cold 0.0356  warm 0.0493  prec 0.0345  chain 2.2  9633s
+[nca] it  48000  cold 0.0321  warm 0.0710  prec 0.0307  chain 2.2  9825s
+trained in 163.8 min, 136576 params
+fresh  score 0.898  success 0.620  action_rough 3.529  agent_rough 1.810  chunk_jump 7.429  calls_per_plan 32.000  ms_per_plan 209.186  steps 218.210
+fixed  score 0.924  success 0.680  action_rough 3.418  agent_rough 1.753  chunk_jump 7.102  calls_per_plan 32.000  ms_per_plan 208.892  steps 216.190
+warm   score 0.859  success 0.360  action_rough 4.770  agent_rough 1.784  chunk_jump 6.684  calls_per_plan 10.579  ms_per_plan 70.421  steps 260.560

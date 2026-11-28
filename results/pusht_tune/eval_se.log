@@ -1,0 +1,22 @@
+base_warm      seed 0  score 0.880  success 0.30  rough 4.92  jump 6.70  ms 177  (29s)
+refresh2       seed 0  score 0.922  success 0.43  rough 4.71  jump 7.56  ms 321  (32s)
+refresh4       seed 0  score 0.926  success 0.42  rough 4.81  jump 7.37  ms 250  (32s)
+refresh8       seed 0  score 0.928  success 0.31  rough 4.95  jump 6.83  ms 192  (32s)
+base_warm      seed 1  score 0.921  success 0.31  rough 4.91  jump 6.39  ms 135  (32s)
+refresh2       seed 1  score 0.948  success 0.52  rough 4.52  jump 7.13  ms 296  (32s)
+refresh4       seed 1  score 0.883  success 0.41  rough 4.90  jump 7.27  ms 187  (32s)
+refresh8       seed 1  score 0.910  success 0.39  rough 4.90  jump 6.74  ms 217  (32s)
+base_warm      seed 2  score 0.835  success 0.27  rough 5.31  jump 7.46  ms 173  (32s)
+refresh2       seed 2  score 0.905  success 0.37  rough 4.83  jump 8.13  ms 291  (32s)
+refresh4       seed 2  score 0.905  success 0.48  rough 5.15  jump 7.93  ms 243  (32s)
+refresh8       seed 2  score 0.878  success 0.41  rough 5.22  jump 7.58  ms 233  (32s)
+# NCA 评估时的设置（不重训；runs/pusht_tune/se_seed{0,1,2}，每格 100 回合）
+
+| 设置 | 执行方式 | 冷启动步数 | 再生步数 | fire_rate | 每几次冷启动 | 得分 | 成功率 | 动作粗糙度 | 衔接跳变 | 毫秒 / 次规划 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| base_warm | warm | 32 | 10 | 0.5 | – | 0.879 ± 0.035 | 29.3% ± 1.7% | 5.05 ± 0.19 | 6.85 ± 0.45 | 162 |
+| refresh2 | warm | 32 | 10 | 0.5 | 2 | 0.925 ± 0.018 | 44.0% ± 6.2% | 4.68 ± 0.13 | 7.61 ± 0.41 | 302 |
+| refresh4 | warm | 32 | 10 | 0.5 | 4 | 0.905 ± 0.018 | 43.7% ± 3.1% | 4.95 ± 0.15 | 7.52 ± 0.29 | 227 |
+| refresh8 | warm | 32 | 10 | 0.5 | 8 | 0.906 ± 0.021 | 37.0% ± 4.3% | 5.02 ± 0.14 | 7.05 ± 0.38 | 214 |
+
+EVALDONE
